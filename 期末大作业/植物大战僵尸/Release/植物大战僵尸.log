@@ -1,0 +1,80 @@
+﻿  main.cpp
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(102): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: 参见“fopen”的声明
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(119): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(119): note: 尝试匹配参数列表“(IMAGE *, const char [11])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(120): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(120): note: 尝试匹配参数列表“(IMAGE *, const char [13])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(130): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(130): note: 尝试匹配参数列表“(IMAGE *, char [64])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(141): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(141): note: 尝试匹配参数列表“(IMAGE *, char [64])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(156): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(156): note: 尝试匹配参数列表“(IMAGE *, char [64])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(170): error C2664: “char *strcpy(char *,const char *)”: 无法将参数 1 从“WCHAR [32]”转换为“char *”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(170): note: 与指向的类型无关；强制转换要求 reinterpret_cast、C 样式强制转换或函数样式强制转换
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(183): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(183): note: 尝试匹配参数列表“(IMAGE *, char [64])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(186): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(186): note: 尝试匹配参数列表“(IMAGE *, const char [30])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(190): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(190): note: 尝试匹配参数列表“(IMAGE *, const char [29])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(193): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(194): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(259): note: 可能是“void loadimage(IMAGE *,LPCTSTR,LPCTSTR,int,int,bool)”
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 或    “void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(196): note: 尝试匹配参数列表“(IMAGE *, const char [29], float, float, bool)”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(202): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(202): note: 尝试匹配参数列表“(IMAGE *, char [64])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(208): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(208): note: 尝试匹配参数列表“(IMAGE *, char [64])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(246): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(294): error C2665: “outtextxy”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(226): note: 可能是“void outtextxy(int,int,TCHAR)”
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(225): note: 或    “void outtextxy(int,int,LPCTSTR)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(294): note: 尝试匹配参数列表“(int, int, char [8])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(334): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(335): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(342): error C2664: “MCIERROR mciSendStringW(LPCWSTR,LPWSTR,UINT,HWND)”: 无法将参数 1 从“const char [22]”转换为“LPCWSTR”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(342): note: 与指向的类型无关；强制转换要求 reinterpret_cast、C 样式强制转换或函数样式强制转换
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(348): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(350): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(435): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(437): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(438): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(465): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(465): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(466): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(466): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(468): warning C4305: “=”: 从“double”到“float”截断
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(592): error C2664: “int MessageBoxW(HWND,LPCWSTR,LPCWSTR,UINT)”: 无法将参数 2 从“const char [5]”转换为“LPCWSTR”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(592): note: 与指向的类型无关；强制转换要求 reinterpret_cast、C 样式强制转换或函数样式强制转换
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(824): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(824): note: 尝试匹配参数列表“(IMAGE *, const char [13])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(825): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(825): note: 尝试匹配参数列表“(IMAGE *, const char [14])”时
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(826): error C2665: “loadimage”: 2 个重载中没有一个可以转换所有参数类型
+  d:\visal studio\vc\auxiliary\vs\include\easyx.h(258): note: 可能是“void loadimage(IMAGE *,LPCTSTR,int,int,bool)”
+  c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(826): note: 尝试匹配参数列表“(IMAGE *, const char [14])”时
+  tools.cpp
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\tools.cpp(90): warning C4244: “初始化”: 从“unsigned __int64”转换到“int”，可能丢失数据
+  vector2.cpp
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(7): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(12): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(17): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(22): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(26): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(46): warning C4244: “return”: 从“double”转换到“__int64”，可能丢失数据
+c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\vector2.cpp(51): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据

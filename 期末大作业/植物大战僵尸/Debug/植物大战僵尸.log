@@ -1,0 +1,36 @@
+﻿  main.cpp
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(257): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(340): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(342): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(356): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\string.h(133): note: 参见“strcpy”的声明
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(419): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(436): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(453): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(585): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(682): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: 参见“fopen”的声明
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(792): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(794): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(795): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(817): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(817): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(818): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(818): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(821): warning C4305: “=”: 从“double”到“float”截断
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(916): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(917): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(944): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\main.cpp(946): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+  tools.cpp
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\tools.cpp(90): warning C4244: “初始化”: 从“unsigned __int64”转换到“int”，可能丢失数据
+  vector2.cpp
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(7): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(12): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(17): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(22): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(26): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(46): warning C4244: “return”: 从“double”转换到“__int64”，可能丢失数据
+c:\users\asus\desktop\pvecode\remote_pve_repo\期末大作业\植物大战僵尸\vector2.cpp(51): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+  正在生成代码...
+  植物大战僵尸.vcxproj -> C:\Users\ASUS\Desktop\pvecode\remote_pve_repo\期末大作业\Debug\植物大战僵尸.exe
