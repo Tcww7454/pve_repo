@@ -201,6 +201,9 @@ void useshovel(ExMessage* msg);
 //只需要在游戏开始时创建一次的元素
 void creat_front();
 
+//实现游戏暂停
+void clickpause(ExMessage* msg);
+
 int main() {
 		
 	gameInit();	//游戏初始化
@@ -463,23 +466,55 @@ void viewScence() {
 }
 
 //状态栏下滑实现
-void barsDown() {
+//void barsDown() {
+//	int height = imgBar.getheight();
+//	for (int y = -height; y <= 0; y++) {
+//		BeginBatchDraw();
+//
+//		putimage(-112, 0, &imgBg);
+//
+//		putimagePNG(250, y, &imgBar);
+//
+//		for (int i = 0; i < ZHI_WU_COUNT; i++) {
+//			int x = 338 + i * 65;
+//			putimagePNG(x, 6 + y, &imgCards[i]);
+//		}
+//		/*
+//		 putimage(0,0,&imgBg);        //把图片渲染出来
+//		putimagePNG(250, 0, &imgBar);  //背景透明化
+//
+//		for (int i = 0; i < ZHI_WU_COUNT; i++) {
+//			int x = 338 + i * 65;
+//			int y = 6;
+//			putimage(x, y, &imgCards[i]);
+//		}
+//
+//		*/
+//
+//		EndBatchDraw();
+//		Sleep(5);
+//	}
+//}
+
+void barsDown()
+{
 	int height = imgBar.getheight();
-	for (int y = -height; y <= 0; y++) {
+	//卡牌槽IMAGE imgBar;
+	for (int y = -height; y <= -10; y++)
+	{
 		BeginBatchDraw();
 
-		putimage(-112, 0, &imgBg);
-
-		putimagePNG(250, y, &imgBar);
-
-		for (int i = 0; i < ZHI_WU_COUNT; i++) {
-			int x = 338 + i * 65;
-			putimagePNG(x, 6 + y, &imgCards[i]);
+		putimagePNG(80, y, &imgBar);
+		for (int i = 0; i < ZHI_WU_COUNT; i++)
+		{
+				putimagePNG(163 + i * 65, y + 10, &imgCards[i]);
 		}
 
 		EndBatchDraw();
-		Sleep(5);
+		Sleep(10);
 	}
+
+	Sleep(200);
 }
 
 //把图片加载到窗口上(渲染)
@@ -488,14 +523,22 @@ void updateWindow()
 
 	BeginBatchDraw();
 
-	putimage(-112, 0, &imgBg);	//加载(渲染)背景板
+	//putimage(-112, 0, &imgBg);	//加载(渲染)背景板
+	//putimagePNG(255, 0, &imgBar);	//加载(渲染)状态栏
+	putimage(-112, 0, &imgBg);
+	putimagePNG(80, -10, &imgBar);
 
-	putimagePNG(255, 0, &imgBar);	//加载(渲染)状态栏
-
-	for (int i = 0; i < ZHI_WU_COUNT; i++) {	//加载(渲染)植物卡牌
-		int x = 343 + i * 65;
-		int y = 6;
-		putimagePNG(x, y, &imgCards[i]);
+	//for (int i = 0; i < ZHI_WU_COUNT; i++) {	//加载(渲染)植物卡牌
+	//	int x = 343 + i * 65;
+	//	int y = 6;
+	//	putimagePNG(x, y, &imgCards[i]);
+	//}
+	for (int i = 0; i < ZHI_WU_COUNT; i++)
+	{
+		if (i == ZHI_WU_COUNT)
+			putimagePNG(163 + i * 65 + 8, -5, &imgCards[i]);
+		else
+			putimagePNG(163 + i * 65, 0, &imgCards[i]);
 	}
 
 	//在地图上加载(渲染)植物
@@ -514,12 +557,12 @@ void updateWindow()
 
 	//渲染铲子
 	if (shovel_front.used == false) {
-		putimagePNG(225 - 65, 0, &imgshovel_frame);
-		putimagePNG(225 - 65, 0, &imgshovel);
+		putimagePNG(235 +7* 65, 0, &imgshovel_frame);
+		putimagePNG(235 +7* 65, 0, &imgshovel);
 	}
 	else if (shovel_front.used == true)
 	{
-		putimagePNG(225 - 65, 0, &imgshovel_frame);
+		putimagePNG(235 +7* 65, 0, &imgshovel_frame);
 		putimagePNG(shovel_front.x, shovel_front.y, &imgshovel);
 	}
 
@@ -539,7 +582,7 @@ void updateWindow()
 	//加载(渲染)阳光值
 	char scoreText[8];
 	sprintf_s(scoreText, sizeof(scoreText), "%d", sunShine);	//把阳光值转换成字符类型
-	outtextxy(283, 67, scoreText);			//渲染输出	位置可调整成居中,而不使用固定值y	
+	outtextxy(110, 60, scoreText);			//渲染输出	位置可调整成居中,而不使用固定值y	255-283 80-108
 
 	//加载(渲染)僵尸
 	for (int i = 0; i < zmMax; i++) {
@@ -601,11 +644,11 @@ void userClick() {
 	static	int status = 0;
 	ExMessage	msg;
 	if (peekmessage(&msg)) {	//判断用户是否有操作
-
+		clickpause(&msg);
 		useshovel(&msg);
 		if (msg.message == WM_LBUTTONDOWN) {	//鼠标左键按下
-			if (msg.x > 343 && msg.x < 343 + 65 * ZHI_WU_COUNT && msg.y < 96) {	//点击卡牌的事件
-				int index = (msg.x - 343) / 65;
+			if (msg.x > 163 && msg.x < 163 + 65 * ZHI_WU_COUNT && msg.y < 96) {	//点击卡牌的事件
+				int index = (msg.x - 163) / 65;
 				
 				//判断阳光值是否足够购买植物
 				//待优化，应该种下后再减的
@@ -793,7 +836,6 @@ void createSunShine() {
 		int off = 2;
 		float distance = balls[i].p4.y - balls[i].p1.y;
 		balls[i].speed = 1.0 / (distance / off);
-
 	}
 
 	//向日葵生产阳光
@@ -939,7 +981,7 @@ void collectSunshine(ExMessage* msg) {
 
 				//优化
 				balls[i].p1 = balls[i].pCur;
-				balls[i].p4 = vector2(262, 0);
+				balls[i].p4 = vector2(100, 0);
 				balls[i].t = 0;
 				float distance = dis(balls[i].p1 - balls[i].p4);
 				float off = 8;
@@ -1242,16 +1284,18 @@ void creatshovel()
 
 void useshovel(ExMessage* msg)
 {
-	/*putimagePNG(225 - 65, 0, &imgshovel_frame);
-	putimagePNG(225 - 65, 0, &imgshovel);*/
-	int shovel_x1 = (225 - 65);
-	int shovel_x2 = (225 - 65)+70;
+	/*putimagePNG(235 - 65, 0, &imgshovel_frame);
+	putimagePNG(235 - 65, 0, &imgshovel);*/
+	/*putimagePNG(235 + 8 * 65, 0, &imgshovel_frame);
+	putimagePNG(235 + 8 * 65, 0, &imgshovel);*/
+	int shovel_x1 = (235 + 7 * 65);
+	int shovel_x2 = (235 + 7 * 65)+70;
 	int shovel_y1 = 0;
 	int shovel_y2 = 70;
 	/*int x = 343 + i * 65;//植物卡牌坐标
 				int y = 6;*/
-	int x1 = 343 + ZHI_WU_COUNT * 65;//x1与x2为植物卡牌栏的横坐标
-	int x2 = 343;
+	int x1 = 163 + ZHI_WU_COUNT * 65;//x1与x2为植物卡牌栏的横坐标
+	int x2 = 163;
 	int y1 = 6;//y1与y2为植物卡牌栏的纵坐标
 	int y2 = 6 + 90;
 
@@ -1298,4 +1342,9 @@ void useshovel(ExMessage* msg)
 			}
 		}
 	
+}
+
+void clickpause(ExMessage* msg)
+{
+
 }
