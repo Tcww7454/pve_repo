@@ -18,6 +18,8 @@ IMAGE imgBg;	//游戏背景图
 IMAGE imgBar;	//状态栏，放植物的背景板
 IMAGE imgCards[ZHI_WU_COUNT];	//植物卡牌数组
 IMAGE* imgZhiWu[ZHI_WU_COUNT][20];	//植物数组 
+IMAGE imgpause_one;
+IMAGE imgpause_two;
 
 int curX, curY;	//当前选中植物在移动中的坐标
 int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
@@ -25,6 +27,8 @@ int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
 int killZmCount;	//杀掉的僵尸总数
 int zmCount;		//生成的僵尸数量
 int gameStatus;		//游戏的状态
+
+int flag = 0;//暂停按钮的状态，待优化
 
 //宏定义游戏窗口大小
 #define	WIN_WIDTH 900
@@ -367,6 +371,10 @@ void gameInit() {
 	loadimage(&imgshovel,"res/Screen/shovel.png");
 	loadimage(&imgshovel_frame, "res/Screen/shovelSlot.png", imgshovel_frame.getwidth() * 2, imgshovel_frame.getheight() * 2, true);
 
+	//初始化暂停的图标，没找到合适的图片，随便凑活凑活
+	loadimage(&imgpause_one, "res/pause/SelectorScreen_Quit1.png");//未按下时为灰色
+	loadimage(&imgpause_two, "res/pause/SelectorScreen_Quit2.png");//按下时为绿色
+
 	//封装一个只需要在游戏开始时创建的物品的函数，这里只有小推车与铲子的创建函数
 	creat_front();
 
@@ -629,6 +637,8 @@ void updateWindow()
 		}
 	}
 
+	putimagePNG((235 + 8 * 65), 0, flag == 0 ? &imgpause_one : &imgpause_two);
+
 	int carmax = sizeof(cars) / sizeof(cars[0]);
 	for (int i = 0; i < carmax; i++)
 	{
@@ -644,8 +654,8 @@ void userClick() {
 	static	int status = 0;
 	ExMessage	msg;
 	if (peekmessage(&msg)) {	//判断用户是否有操作
-		clickpause(&msg);
 		useshovel(&msg);
+		clickpause(&msg);
 		if (msg.message == WM_LBUTTONDOWN) {	//鼠标左键按下
 			if (msg.x > 163 && msg.x < 163 + 65 * ZHI_WU_COUNT && msg.y < 96) {	//点击卡牌的事件
 				int index = (msg.x - 163) / 65;
@@ -1284,8 +1294,6 @@ void creatshovel()
 
 void useshovel(ExMessage* msg)
 {
-	/*putimagePNG(235 - 65, 0, &imgshovel_frame);
-	putimagePNG(235 - 65, 0, &imgshovel);*/
 	/*putimagePNG(235 + 8 * 65, 0, &imgshovel_frame);
 	putimagePNG(235 + 8 * 65, 0, &imgshovel);*/
 	int shovel_x1 = (235 + 7 * 65);
@@ -1346,5 +1354,36 @@ void useshovel(ExMessage* msg)
 
 void clickpause(ExMessage* msg)
 {
-
+	////初始化暂停的图标，没找到合适的图片，随便凑活凑活
+	int pause_x1 = (235 + 8 * 65);
+	int pause_x2 = (235 + 8 * 65) + 70;
+	int pause_y1 = 0;
+	int pause_y2 = 70;
+    {	
+			if (msg->message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮
+				msg->x > pause_x1 && msg->x<pause_x2 && msg->y>pause_y1 && msg->y < pause_y2)
+			{
+				flag = 1;
+				cout << "暂停"<<endl;
+				bool isRunning = true; // 添加一个布尔变量来控制循环的执行
+				while (isRunning) // 使用布尔变量作为循环条件
+				{
+					/*此处不能用上面的msg鼠标，应该那个在每次调用clickpause函数时数据才会更新，而此处循环内已经不会更新了，
+					所以在此处创建一个新的鼠标变量来实现退出while循环，取消暂停*/
+					ExMessage msg1;
+					if (peekmessage(&msg1)) {
+						if (msg1.message == WM_RBUTTONDOWN) {
+												flag = 0;
+												isRunning = false; // 将布尔变量设置为false，退出循环
+												cout << "继续游戏"<<endl;
+											}
+					}
+					
+				}
+			}
+		//else if (msg.message == WM_LBUTTONUP && flag == 1) {	//鼠标左键抬起
+		//	EndBatchDraw();
+		//	return;
+		//}
+	}
 }

@@ -1,25 +1,25 @@
 ﻿  main.cpp
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(260): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(343): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(345): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(359): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(264): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(347): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(349): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(363): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   e:\windows kits\10\include\10.0.17763.0\ucrt\string.h(133): note: 参见“strcpy”的声明
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(422): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(439): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(456): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(628): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(725): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(430): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(447): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(464): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(636): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(735): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: 参见“fopen”的声明
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(835): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(837): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(838): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(859): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(859): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(860): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(860): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(863): warning C4305: “=”: 从“double”到“float”截断
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(958): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(959): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(986): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
-c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(988): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(845): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(847): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(848): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(869): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(869): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(870): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(870): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(873): warning C4305: “=”: 从“double”到“float”截断
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(968): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(969): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(996): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
+c:\users\asus\desktop\pvecode2\pve_repo\期末大作业\植物大战僵尸\main.cpp(998): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
   植物大战僵尸.vcxproj -> C:\Users\ASUS\Desktop\pvecode2\pve_repo\期末大作业\Debug\植物大战僵尸.exe
