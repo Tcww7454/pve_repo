@@ -1,3 +1,10 @@
+commit 7f2bbf079e5a820dab37e4485ff0ed870ae8251d
+Author: Tcww7454 <2684242639@qq.com>
+Date:   Fri May 31 16:04:06 2024 +0800
+
+    实现了在暂停时存储一局数据，并在开局时选择是否继续上一局
+
+
 commit b4ff4c05fbbf55311deacaa344c3ac5f4d6d0340 (HEAD -> main, origin/main)
 Author: Tcww7454 <2684242639@qq.com>
 Date:   Thu May 30 21:11:30 2024 +0800
