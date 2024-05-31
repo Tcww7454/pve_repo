@@ -8,6 +8,7 @@ using namespace std;	//暂时不知道怎么修改
 #include"vector2.h"	//向量工具包
 #include<stdio.h>
 #include<mmsystem.h>	//音乐
+#include<fstream> //文件
 #pragma comment(lib,"winmm.lib") 
 
 enum {WAN_DAO,XIANG_RI_KUI,SHI_REN_HUA,ZHI_WU_COUNT};	//植物枚举
@@ -27,7 +28,6 @@ int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
 int killZmCount;	//杀掉的僵尸总数
 int zmCount;		//生成的僵尸数量
 int gameStatus;		//游戏的状态
-
 int flag = 0;//暂停按钮的状态，待优化
 
 //宏定义游戏窗口大小
@@ -208,6 +208,12 @@ void creat_front();
 //实现游戏暂停
 void clickpause(ExMessage* msg);
 
+//保存游戏
+void game_save();
+
+//读取上一局存档
+void read_archive();
+
 int main() {
 		
 	gameInit();	//游戏初始化
@@ -384,27 +390,55 @@ void gameInit() {
 
 //游戏开始界面实现
 void startUI() {
-	IMAGE imgMenu,imgMenu1,imgMenu2;
-	int	flag = 0;
+	IMAGE imgMenu,imgMenu1,imgMenu2,imgcontinue1,imgcontinue2; 
+	int	flag1 = 0,flag2=0;//以为开始游戏的图标，2为继续上局游戏的图标
 	loadimage(&imgMenu, "res/menu.png");	//加载开始背景图
 	loadimage(&imgMenu1, "res/menu1.png");
 	loadimage(&imgMenu2, "res/menu2.png");
+	loadimage(&imgcontinue1, "res/Screen/continue1.png");
+	loadimage(&imgcontinue2, "res/Screen/continue2.png");
 
-	while (1) {
+	while (1) 
+	{
 		BeginBatchDraw();
+		//flag1 = 0, flag2 = 0;
 		putimage(0, 0, &imgMenu);	//渲染开始背景图到窗口上
-		putimagePNG(474, 75, flag == 0 ? &imgMenu1 : &imgMenu2);
+		putimagePNG(474, 75, flag1 == 0 ? &imgMenu1 : &imgMenu2);
+		putimagePNG(484, 300, flag2 == 0 ? &imgcontinue1 : &imgcontinue2);
 
 		ExMessage	msg;
 		if (peekmessage(&msg)) {
+			if (msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215)flag1 = 1; else flag1 = 0;
+			if (msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122)flag2 = 1; else flag2 = 0;
+
 			if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮
 				msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215) {
-				flag = 1;
+				flag1 = 1;
+			}
+			else if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮 286 122
+				msg.x > 484 && msg.x < 484+286 && msg.y>300 && msg.y < 300+122) {
+				flag2 = 1;
+				
 			}
 		}
-		else if (msg.message == WM_LBUTTONUP && flag == 1) {	//鼠标左键抬起
-			EndBatchDraw();
-			return;
+		else if (msg.message == WM_LBUTTONUP ) {	//鼠标左键抬起
+			if (msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215 && flag1 == 1)
+			{
+				flag1 = 0;
+				EndBatchDraw();
+				return;
+			}
+			else if (msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122 && flag2 == 1)
+			{
+				flag2 = 0;
+				read_archive();
+				EndBatchDraw();
+				return;
+			}
+			else
+			{
+				flag1 =flag2= 0;
+			}
 		}
 		EndBatchDraw();
 	}
@@ -1068,6 +1102,7 @@ void updateZm() {
 					if (zms[i].frameIndex >= 20) {
 						zms[i].used = false;
 						killZmCount++;
+						cout << "杀掉的僵尸数：" << killZmCount << endl;
 						if (killZmCount == ZM_MAX) {
 							gameStatus = WIN;
 						}
@@ -1267,6 +1302,7 @@ void checkcarzm()
 					else //小推车在运动后再碰到僵尸
 					{
 						killZmCount++;
+						cout << "杀掉的僵尸数：" << killZmCount << endl;
 						zms[j].dead = true;
 						zms[j].speed = 0;
 						zms[j].frameIndex = 0;
@@ -1373,6 +1409,7 @@ void clickpause(ExMessage* msg)
 					ExMessage msg1;
 					if (peekmessage(&msg1)) {
 						if (msg1.message == WM_RBUTTONDOWN) {
+												game_save();
 												flag = 0;
 												isRunning = false; // 将布尔变量设置为false，退出循环
 												cout << "继续游戏"<<endl;
@@ -1386,4 +1423,145 @@ void clickpause(ExMessage* msg)
 		//	return;
 		//}
 	}
+}
+
+void game_save()
+{
+	//把几个池子的数据全部存入，再存入几个定义的全局变量
+	ofstream outfile("preserve.txt");
+	if (!fileExist("preserve.txt"))
+		return;
+	
+	outfile << sunShine << " " << killZmCount << " "<<gameStatus<<" "<<flag<<endl;
+
+	//阳光数据
+	for (int i = 0; i < ballMax; i++)
+	{
+		outfile <<  balls[i].destY << " " << balls[i].frameIndex << " " <<
+					balls[i].p1.x  << " " << balls[i].p1.y  << " " <<
+					balls[i].p2.x  << " " << balls[i].p2.y  << " " <<
+					balls[i].p3.x  << " " << balls[i].p3.y  << " " <<
+					balls[i].p4.x  << " " << balls[i].p4.y  << " " <<
+					balls[i].pCur.x << " " << balls[i].pCur.y << " " <<
+					balls[i].speed << " " << balls[i].status << " " <<
+					balls[i].t     << " " << balls[i].timer << " " <<
+					balls[i].used  << " " << balls[i].x << " " <<
+					balls[i].xoff  << " " << balls[i].y << " " <<
+					balls[i].yoff;
+		outfile << endl;
+	}
+
+	//植物数据
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 9; j++)
+		{
+			outfile << map[i][j].catched << " " << map[i][j].deadTimer << " "
+					<< map[i][j].frameIndex << " " << map[i][j].shootTimer << " "
+					<< map[i][j].timer << " " << map[i][j].type << " "
+					<< map[i][j].x << " " << map[i][j].y<<" ";
+			outfile << endl;
+		}
+	}
+
+	//僵尸数据
+	for (int i = 0; i < zmMax; i++)
+	{
+		outfile << zms[i].blood << " " << zms[i].dead << " "
+				<< zms[i].eating << " " << zms[i].frameIndex << " "
+				<< zms[i].row << " " << zms[i].speed << " "
+				<< zms[i].used << " " << zms[i].x << " "
+				<< zms[i].y << " ";
+		outfile << endl;
+	}
+
+	//小推车数据
+	for (int i = 0; i < carmax; i++)
+	{
+		outfile << cars[i].move << " " << cars[i].used << " "
+				<< cars[i].x << " " << cars[i].y << " ";
+		outfile << endl;
+	}
+
+	//豌豆子弹数据
+	for (int i = 0; i < bulletMax; i++)
+	{
+		outfile << bullets[i].blast << " " << bullets[i].frameIndex << " "
+				<< bullets[i].row << " " << bullets[i].speed << " "
+				<< bullets[i].used << " " << bullets[i].x << " "
+				<< bullets[i].y << " ";
+		outfile << endl;
+	}
+
+	outfile.close();
+}
+
+void read_archive()
+{
+	ifstream infile;
+	infile.open("preserve.txt");
+
+	if (!fileExist("preserve.txt"))
+		return;
+
+	infile >> sunShine >> killZmCount >> gameStatus >>  flag;
+
+	//阳光数据
+	for (int i = 0; i < ballMax; i++)
+	{
+		infile >> balls[i].destY >> balls[i].frameIndex >>
+			balls[i].p1.x >> balls[i].p1.y  >>
+			balls[i].p2.x >> balls[i].p2.y  >>
+			balls[i].p3.x >> balls[i].p3.y  >>
+			balls[i].p4.x >> balls[i].p4.y  >>
+			balls[i].pCur.x >> balls[i].pCur.y  >>
+			balls[i].speed >> balls[i].status  >>
+			balls[i].t >> balls[i].timer >>
+			balls[i].used >> balls[i].x  >>
+			balls[i].xoff >> balls[i].y  >>
+			balls[i].yoff;
+	}
+
+	//植物数据
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 9; j++)
+		{
+			infile >> map[i][j].catched >> map[i][j].deadTimer
+				>> map[i][j].frameIndex >> map[i][j].shootTimer
+				>> map[i][j].timer >> map[i][j].type 
+				>> map[i][j].x >> map[i][j].y ;
+		}
+	}
+
+	//僵尸数据
+	for (int i = 0; i < zmMax; i++)
+	{
+		infile >> zms[i].blood >> zms[i].dead
+			>> zms[i].eating >> zms[i].frameIndex
+			>> zms[i].row >> zms[i].speed
+			>> zms[i].used >> zms[i].x
+			>> zms[i].y ;
+		
+	}
+
+	//小推车数据
+	for (int i = 0; i < carmax; i++)
+	{
+		infile >> cars[i].move >> cars[i].used
+			>> cars[i].x >> cars[i].y ;
+		
+	}
+
+	//豌豆子弹数据
+	for (int i = 0; i < bulletMax; i++)
+	{
+		infile >> bullets[i].blast >> bullets[i].frameIndex
+			>> bullets[i].row >> bullets[i].speed
+			>> bullets[i].used >> bullets[i].x
+			>> bullets[i].y ;
+		
+	}
+
+	infile.close();
 }
