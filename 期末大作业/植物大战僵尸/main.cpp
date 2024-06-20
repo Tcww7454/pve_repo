@@ -9,6 +9,10 @@ using namespace std;	//暂时不知道怎么修改
 #include<stdio.h>
 #include<mmsystem.h>	//音乐
 #include<fstream> //文件
+#include <setjmp.h>//用于一局游戏退出跳转到主菜单
+#include <Windows.h>
+
+jmp_buf jmpbuffer;
 #pragma comment(lib,"winmm.lib") 
 
 enum {WAN_DAO,XIANG_RI_KUI,SHI_REN_HUA,ZHI_WU_COUNT};	//植物枚举
@@ -21,6 +25,7 @@ IMAGE imgCards[ZHI_WU_COUNT];	//植物卡牌数组
 IMAGE* imgZhiWu[ZHI_WU_COUNT][20];	//植物数组 
 IMAGE imgpause_one;
 IMAGE imgpause_two;
+IMAGE *imgpause[9];//总共9张图片，偷个懒，注意每个元素对应哪张图片吧
 
 int curX, curY;	//当前选中植物在移动中的坐标
 int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
@@ -28,7 +33,7 @@ int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
 int killZmCount;	//杀掉的僵尸总数
 int zmCount;		//生成的僵尸数量
 int gameStatus;		//游戏的状态
-int flag = 0;//暂停按钮的状态，待优化
+//int flag = 0;//暂停按钮的状态，待优化
 
 //宏定义游戏窗口大小
 #define	WIN_WIDTH 900
@@ -214,16 +219,26 @@ void game_save();
 //读取上一局存档
 void read_archive();
 
+//初始化暂停要用的图片，有10张，单独封装出来好看点
+void gameinit_pause();
+
+//渲染暂停时的所有图片
+void update_pause(bool*type);
+
+//暂停时鼠标信息的接收
+void pause_click(ExMessage *msg, bool & isRunning, bool*type);
+
 int main() {
 		
 	gameInit();	//游戏初始化
 
+	setjmp(jmpbuffer);
+	
 	startUI();	//加载游戏开始界面
 
-	viewScence();	//场景巡场
+	//viewScence();	//场景巡场
 
-	barsDown();	//状态栏下滑
-
+	//barsDown();	//状态栏下滑
 
 
 	//双缓冲，先将要绘制的内容一次性绘制在图片上，再把图片输出，避免不断从内存读取数据而导致的屏幕闪烁
@@ -381,6 +396,9 @@ void gameInit() {
 	loadimage(&imgpause_one, "res/pause/SelectorScreen_Quit1.png");//未按下时为灰色
 	loadimage(&imgpause_two, "res/pause/SelectorScreen_Quit2.png");//按下时为绿色
 
+	//初始化9张暂停图片
+	gameinit_pause();
+
 	//封装一个只需要在游戏开始时创建的物品的函数，这里只有小推车与铲子的创建函数
 	creat_front();
 
@@ -403,8 +421,8 @@ void startUI() {
 		BeginBatchDraw();
 		//flag1 = 0, flag2 = 0;
 		putimage(0, 0, &imgMenu);	//渲染开始背景图到窗口上
-		putimagePNG(474, 75, flag1 == 0 ? &imgMenu1 : &imgMenu2);
-		putimagePNG(484, 300, flag2 == 0 ? &imgcontinue1 : &imgcontinue2);
+		putimagePNG(474, 75, flag1 == 0 ? &imgMenu2 : &imgMenu1);
+		putimagePNG(484, 300, flag2 == 0 ? &imgcontinue2 : &imgcontinue1);
 
 		ExMessage	msg;
 		if (peekmessage(&msg)) {
@@ -671,7 +689,9 @@ void updateWindow()
 		}
 	}
 
-	putimagePNG((235 + 8 * 65), 0, flag == 0 ? &imgpause_one : &imgpause_two);
+	//putimagePNG((235 + 8 * 65), 0, flag == 0 ? &imgpause_one : &imgpause_two);
+	//putimagePNG((235 + 8 * 65), 25, flag == 0 ? imgpause[2] : imgpause[3]);
+	putimagePNG((235 + 8 * 65), 25, imgpause[2]);
 
 	int carmax = sizeof(cars) / sizeof(cars[0]);
 	for (int i = 0; i < carmax; i++)
@@ -930,9 +950,16 @@ void updateSunShine() {
 			}
 			else if (balls[i].status == SUNSHINE_GROUND) {
 				balls[i].timer++;
-				if (balls[i].timer > 100) {
-					balls[i].used = false;
-					balls[i].timer = 0;
+				if (balls[i].timer >50) {//阳光自动消失或收集的时间
+					//通过更改此处可以选择是否进行自动收集阳光
+					{//阳光到时间消失
+						balls[i].used = false;
+						balls[i].timer = 0;
+					}
+					//自动收集
+						/*balls[i].timer = 0;
+						balls[i].status = SUNSHINE_COLLECT;*/
+					
 				}
 			}
 			else if (balls[i].status == SUNSHINE_COLLECT) {
@@ -1390,34 +1417,38 @@ void useshovel(ExMessage* msg)
 
 void clickpause(ExMessage* msg)
 {
-	////初始化暂停的图标，没找到合适的图片，随便凑活凑活
+	static bool pause_type[3] = { false,false,false };
+
+	//初始化暂停的图标，没找到合适的图片，随便凑活凑活
+	//putimagePNG((235 + 8 * 65), 25, flag == 0 ? imgpause[2] : imgpause[3]);
 	int pause_x1 = (235 + 8 * 65);
-	int pause_x2 = (235 + 8 * 65) + 70;
-	int pause_y1 = 0;
-	int pause_y2 = 70;
+	int pause_x2 = (235 + 8 * 65) + 247;
+	int pause_y1 = 25;
+	int pause_y2 = 25+46;
     {	
 			if (msg->message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮
 				msg->x > pause_x1 && msg->x<pause_x2 && msg->y>pause_y1 && msg->y < pause_y2)
 			{
-				flag = 1;
+				//flag = 1;
 				cout << "暂停"<<endl;
 				bool isRunning = true; // 添加一个布尔变量来控制循环的执行
 				while (isRunning) // 使用布尔变量作为循环条件
 				{
+					update_pause(pause_type);
+					//putimagePNG((235 + 8 * 65), 25, imgpause[3]);//直接覆盖图片，待优化  主菜单按下时的图片
+					
 					/*此处不能用上面的msg鼠标，应该那个在每次调用clickpause函数时数据才会更新，而此处循环内已经不会更新了，
 					所以在此处创建一个新的鼠标变量来实现退出while循环，取消暂停*/
 					ExMessage msg1;
-					if (peekmessage(&msg1)) {
-						if (msg1.message == WM_RBUTTONDOWN) {
-												game_save();
-												flag = 0;
-												isRunning = false; // 将布尔变量设置为false，退出循环
-												cout << "继续游戏"<<endl;
-											}
+					if (peekmessage(&msg1)) 
+					{
+						pause_click( &msg1,isRunning,pause_type);
+						
 					}
 					
 				}
 			}
+			
 		//else if (msg.message == WM_LBUTTONUP && flag == 1) {	//鼠标左键抬起
 		//	EndBatchDraw();
 		//	return;
@@ -1432,7 +1463,7 @@ void game_save()
 	if (!fileExist("preserve.txt"))
 		return;
 	
-	outfile << sunShine << " " << killZmCount << " "<<gameStatus<<" "<<flag<<endl;
+	outfile << sunShine << " " << killZmCount << " "<<gameStatus<<endl;
 
 	//阳光数据
 	for (int i = 0; i < ballMax; i++)
@@ -1504,7 +1535,7 @@ void read_archive()
 	if (!fileExist("preserve.txt"))
 		return;
 
-	infile >> sunShine >> killZmCount >> gameStatus >>  flag;
+	infile >> sunShine >> killZmCount >> gameStatus ;
 
 	//阳光数据
 	for (int i = 0; i < ballMax; i++)
@@ -1564,4 +1595,113 @@ void read_archive()
 	}
 
 	infile.close();
+}
+
+void gameinit_pause()
+{
+	//总共9张，5组图片，每两张为对应的按下与未按下的图片，一张为墓碑图
+	//0.1为“主菜单”图片；2,3为“菜单”图片；4,5,为“返回游戏”图片；6,7为“重新开始本关卡”图片，9为墓碑图
+	char name[64];
+	memset(name, 0, sizeof(name));
+	//IMAGE *imgpause[10]
+	imgpause[9] = new IMAGE;
+	loadimage(imgpause[9], "res/Screen/pause_0.png");
+
+	for (int i = 0; i < 2; i++)//主菜单
+	{
+		sprintf_s(name, sizeof(name), "res/Screen/mainmenu%d.jpg", i+1);
+		if (fileExist(name)) {
+			imgpause[i] = new IMAGE;
+			loadimage(imgpause[i], name);
+		}
+		else {
+			break;
+		}
+		//loadimage(imgpause[i], name);
+	}
+	for (int i = 0; i < 2; i++)//菜单
+	{
+		sprintf_s(name, sizeof(name), "res/Screen/pause_menu%d.jpg", i + 1);
+		if (fileExist(name)) {
+			imgpause[i+2] = new IMAGE;
+			loadimage(imgpause[i+2], name);
+		}
+		else {
+			break;
+		}
+		//loadimage(imgpause[i+2], name);
+	}
+	for (int i = 0; i < 2; i++)//返回游戏
+	{
+		sprintf_s(name, sizeof(name), "res/Screen/reback%d.jpg", i + 1);
+		if (fileExist(name)) {
+			imgpause[i + 4] = new IMAGE;
+			loadimage(imgpause[i + 4], name);
+		}
+		else {
+			break;
+		}
+	}
+	for (int i = 0; i < 2; i++)//重新开始此关卡
+	{
+		sprintf_s(name, sizeof(name), "res/Screen/restart%d.jpg", i + 1);
+		if (fileExist(name)) {
+			imgpause[i + 6] = new IMAGE;
+			loadimage(imgpause[i + 6], name);
+		}
+		else {
+			break;
+		}
+	}
+}
+
+void update_pause(bool*type)
+{
+	BeginBatchDraw();
+	//0.1为“主菜单”图片；2,3为“菜单”图片；4,5,为“返回游戏”图片；6,7为“重新开始本关卡”图片，9为墓碑图
+	putimagePNG((235 + 8 * 65), 25, imgpause[3]);//直接覆盖图片，待优化  主菜单按下时的图片
+
+	putimagePNG(238, 50, imgpause[9]);//墓碑菜单
+
+	putimagePNG(420 - 90, 450 - 125, type[0] ? imgpause[7]: imgpause[6]);
+
+	putimagePNG(420-94, 450-125+50, type[1] ? imgpause[1] : imgpause[0]);
+
+	putimagePNG(360-80, 450 - 125 + 100+22, type[2] ? imgpause[5] : imgpause[4]);
+
+	EndBatchDraw();
+}
+
+void pause_click(ExMessage *msg,bool &isRunning, bool*type)
+{
+	if (msg->x > 360 - 80 && msg->x < 360 - 80 + 336 && msg->y>450 - 125 + 100 + 22 && msg->y < 450 - 125 + 100 + 22 + 75)//返回游戏的图标
+	{
+		type[2] = true;
+		if (msg->message == WM_LBUTTONDOWN) {
+			game_save();
+			//flag = 0;
+			isRunning = false; // 将布尔变量设置为false，退出循环
+			cout << "继续游戏" << endl;
+		}
+	}
+	else type[2] = false;
+
+	if (msg->x > 420 - 94 && msg->x < 420 - 94+247 && msg->y>450 - 125 + 50 && msg->y < 450 - 125 + 50+46)//返回主菜单的图标
+	{
+		type[1] = true;
+		if (msg->message == WM_LBUTTONDOWN) 
+		{
+			game_save();
+			longjmp(jmpbuffer, 1);
+		}
+	}
+	else type[1] = false;
+
+	if (msg->x > 420 - 90 && msg->x < 420 - 90 + 241 && msg->y>450 - 125  && msg->y < 450 - 125 + 50 )//重新开始关卡的图标
+	{
+		type[0] = true;
+	}
+	else type[0] = false;
+
+	
 }
