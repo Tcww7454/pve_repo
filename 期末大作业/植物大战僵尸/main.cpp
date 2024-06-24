@@ -13,6 +13,7 @@ using namespace std;	//暂时不知道怎么修改
 #include <Windows.h>
 
 jmp_buf jmpbuffer;
+jmp_buf jmpbuffer_two;
 #pragma comment(lib,"winmm.lib") 
 
 enum {WAN_DAO,XIANG_RI_KUI,SHI_REN_HUA,ZHI_WU_COUNT};	//植物枚举
@@ -25,7 +26,8 @@ IMAGE imgCards[ZHI_WU_COUNT];	//植物卡牌数组
 IMAGE* imgZhiWu[ZHI_WU_COUNT][20];	//植物数组 
 IMAGE imgpause_one;
 IMAGE imgpause_two;
-IMAGE *imgpause[9];//总共9张图片，偷个懒，注意每个元素对应哪张图片吧
+IMAGE *imgpause[9];//总共9张图片，偷个懒，注意每个元素对应哪张图片吧，使用这种方法渲染墓碑图片会访问冲突
+IMAGE imgtombstone;
 
 int curX, curY;	//当前选中植物在移动中的坐标
 int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
@@ -228,6 +230,9 @@ void update_pause(bool*type);
 //暂停时鼠标信息的接收
 void pause_click(ExMessage *msg, bool & isRunning, bool*type);
 
+//通过对几个池子和几个关键数据进行初始化来实现重新开始本局游戏
+void read_regame();
+
 int main() {
 		
 	gameInit();	//游戏初始化
@@ -236,6 +241,7 @@ int main() {
 	
 	startUI();	//加载游戏开始界面
 
+	setjmp(jmpbuffer_two);
 	//viewScence();	//场景巡场
 
 	//barsDown();	//状态栏下滑
@@ -1606,6 +1612,7 @@ void gameinit_pause()
 	//IMAGE *imgpause[10]
 	imgpause[9] = new IMAGE;
 	loadimage(imgpause[9], "res/Screen/pause_0.png");
+	loadimage(&imgtombstone, "res/Screen/pause_0.png");
 
 	for (int i = 0; i < 2; i++)//主菜单
 	{
@@ -1661,7 +1668,8 @@ void update_pause(bool*type)
 	//0.1为“主菜单”图片；2,3为“菜单”图片；4,5,为“返回游戏”图片；6,7为“重新开始本关卡”图片，9为墓碑图
 	putimagePNG((235 + 8 * 65), 25, imgpause[3]);//直接覆盖图片，待优化  主菜单按下时的图片
 
-	putimagePNG(238, 50, imgpause[9]);//墓碑菜单
+	//putimagePNG(238, 50, imgpause[9]);//墓碑菜单 使用这个渲染会访问冲突
+	putimagePNG(238, 50, &imgtombstone);//墓碑菜单
 
 	putimagePNG(420 - 90, 450 - 125, type[0] ? imgpause[7]: imgpause[6]);
 
@@ -1700,8 +1708,28 @@ void pause_click(ExMessage *msg,bool &isRunning, bool*type)
 	if (msg->x > 420 - 90 && msg->x < 420 - 90 + 241 && msg->y>450 - 125  && msg->y < 450 - 125 + 50 )//重新开始关卡的图标
 	{
 		type[0] = true;
+		if (msg->message == WM_LBUTTONDOWN)
+		{
+			read_regame();
+			isRunning = false; // 将布尔变量设置为false，退出循环
+			cout << "继续游戏" << endl;
+			longjmp(jmpbuffer_two, 1);
+		}
 	}
 	else type[0] = false;
 
 	
+}
+
+void read_regame()
+{
+	sunShine = 50;
+	killZmCount = gameStatus = 0;
+
+	memset(balls, 0, sizeof(balls));
+	memset(map, 0, sizeof(map));
+	memset(zms, 0, sizeof(zms));
+	//memset(cars, 0, sizeof(cars));
+	creatcar();
+	memset(bullets, 0, sizeof(bullets));
 }
