@@ -1,8 +1,7 @@
 #include<iostream>
-using namespace std;	//暂时不知道怎么修改
+using namespace std;	
 #include<graphics.h>
 #include"tools.h"
-#include<ctime>
 #include<ctime>
 #include<cmath>
 #include"vector2.h"	//向量工具包
@@ -28,6 +27,8 @@ IMAGE imgpause_one;
 IMAGE imgpause_two;
 IMAGE *imgpause[9];//总共9张图片，偷个懒，注意每个元素对应哪张图片吧，使用这种方法渲染墓碑图片会访问冲突
 IMAGE imgtombstone;
+IMAGE *imgChomperAttack[18];//食人花吃僵尸18帧图片
+IMAGE *imgChomperDigest[18];//食人花吃僵尸18帧图片
 
 int curX, curY;	//当前选中植物在移动中的坐标
 int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
@@ -52,6 +53,8 @@ struct zhiWu {	//植物结构体
 
 	int x, y;
 	int timer;	//用于向日葵生成阳光的计时器
+	bool eating;//植物吃僵尸
+	bool digest;//植物的消化状态
 };
 
 struct sunShineBall {	//阳光球结构体
@@ -230,8 +233,14 @@ void update_pause(bool*type);
 //暂停时鼠标信息的接收
 void pause_click(ExMessage *msg, bool & isRunning, bool*type);
 
+//食人花图片的初始化
+void gameinit_shirenhua();
+
 //通过对几个池子和几个关键数据进行初始化来实现重新开始本局游戏
 void read_regame();
+
+//食人花吃僵尸的实现
+void chomper_eating(int x,int y);
 
 int main() {
 		
@@ -405,6 +414,9 @@ void gameInit() {
 	//初始化9张暂停图片
 	gameinit_pause();
 
+	//初始化食人花的图片
+	gameinit_shirenhua();
+
 	//封装一个只需要在游戏开始时创建的物品的函数，这里只有小推车与铲子的创建函数
 	creat_front();
 
@@ -445,7 +457,8 @@ void startUI() {
 				
 			}
 		}
-		else if (msg.message == WM_LBUTTONUP ) {	//鼠标左键抬起
+		//WM_LBUTTONUP
+		else if (msg.message == WM_LBUTTONDOWN) {	//鼠标左键抬起，由于设置不好会产生冲突，简单改成按下，待优化
 			if (msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215 && flag1 == 1)
 			{
 				flag1 = 0;
@@ -615,7 +628,10 @@ void updateWindow()
 				//int y = 179 + i * 102 + 14;
 				int zhiWuType = map[i][j].type - 1;
 				int index = map[i][j].frameIndex;
+				if(map[i][j].type==SHI_REN_HUA+1&&map[i][j].eating==true)
+					putimagePNG(map[i][j].x, map[i][j].y, imgChomperAttack[index]);
 				//putimagePNG(x, y, imgZhiWu[zhiWuType][index]);
+				else
 				putimagePNG(map[i][j].x, map[i][j].y, imgZhiWu[zhiWuType][index]);
 			}
 		}
@@ -747,8 +763,8 @@ void userClick() {
 						status = 1;
 						curZhiWu = index + 1;
 						//使植物显示在点击位置，避免了植物出现在上次消失位置的小bug
-						curX = msg.x;
-						curY = msg.y;
+						curX = msg.x-25;//由图片大小导致的坐标差
+						curY = msg.y-60;
 						sunShine -= 150;
 					}
 				}
@@ -778,6 +794,8 @@ void userClick() {
 
 					map[row][col].x = 256 - 112 + col * 81;	//植物坐标
 					map[row][col].y = 179 + row * 102 + 14;
+					map[row][col].eating = false;
+					map[row][col].digest = false;
 				}
 			}
 			//使植物释放消失
@@ -809,17 +827,20 @@ void updateGame() {
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 9; j++) {
 			if (map[i][j].type > 0) {
+				if(map[i][j].type==SHI_REN_HUA+1 && map[i][j].eating==true) chomper_eating(i,j);
+				else
+				{
 				map[i][j].frameIndex++;
 				int	zhiWuType = map[i][j].type - 1;
 				int	index = map[i][j].frameIndex;
 				if (imgZhiWu[zhiWuType][index] == NULL) {
 					map[i][j].frameIndex = 0;
 				}
+				
+				}
 			}
 		}
 	}
-
-	
 
 	//小推车与僵尸的碰撞检测
 	checkcarzm();
@@ -1219,7 +1240,6 @@ void collisionCheck() {
 	//僵尸与植物的碰撞检测
 	checkZm2ZhiWu();
 
-	
 }
 
 //豌豆子弹与僵尸的碰撞检测实现
@@ -1255,19 +1275,34 @@ void checkZm2ZhiWu() {
 		for (int k = 0; k < 9; k++) {
 			if (map[row][k].type == 0)continue;
 			int zhiWuX = 256 - 112 + k * 81;	//定义僵尸开吃范围
-			int x1 = zhiWuX + 10;
+			int x1 = zhiWuX + 10;//x1,x2分别为植物的左右界
 			int x2 = zhiWuX + 60;
-			int x3 = zms[i].x + 80;
+			int x3 = zms[i].x + 80;//x3为僵尸的左界
 
 			if (x3 > x1 && x3 < x2) {
-				if (map[row][k].catched==true){	//僵尸吃的过程中的一些配置
+				if (map[row][k].type!=SHI_REN_HUA+1 &&map[row][k].catched==true)
+				{	//僵尸吃的过程中的一些配置
 					map[row][k].deadTimer++;
-					if (map[row][k].deadTimer > 100) {	//僵尸吃完了-重置参数
+					if (map[row][k].deadTimer > 100) 
+					{	//僵尸吃完了-重置参数
 						map[row][k].deadTimer = 0;
 						map[row][k].type = 0;
 						zms[i].eating = false;
 						zms[i].frameIndex = 0;
 						zms[i].speed = 1;
+					}
+				}
+				else if(map[row][k].type == SHI_REN_HUA + 1 )
+				{
+					if (map[row][k].eating == false)
+					{
+						if (x3 <= x2)
+						{
+							map[row][k].eating = true;
+							//chomper_eating();
+							zms[i].dead = true;
+							zms[i].used = false;
+						}
 					}
 				}
 				else {	//僵尸开吃-配置参数
@@ -1496,7 +1531,8 @@ void game_save()
 			outfile << map[i][j].catched << " " << map[i][j].deadTimer << " "
 					<< map[i][j].frameIndex << " " << map[i][j].shootTimer << " "
 					<< map[i][j].timer << " " << map[i][j].type << " "
-					<< map[i][j].x << " " << map[i][j].y<<" ";
+					<< map[i][j].x << " " << map[i][j].y<<" "
+					<<map[i][j].eating<<" "<<map[i][j].digest ;
 			outfile << endl;
 		}
 	}
@@ -1567,7 +1603,8 @@ void read_archive()
 			infile >> map[i][j].catched >> map[i][j].deadTimer
 				>> map[i][j].frameIndex >> map[i][j].shootTimer
 				>> map[i][j].timer >> map[i][j].type 
-				>> map[i][j].x >> map[i][j].y ;
+				>> map[i][j].x >> map[i][j].y 
+				>>map[i][j].eating>>map[i][j].digest;
 		}
 	}
 
@@ -1717,8 +1754,6 @@ void pause_click(ExMessage *msg,bool &isRunning, bool*type)
 		}
 	}
 	else type[0] = false;
-
-	
 }
 
 void read_regame()
@@ -1732,4 +1767,46 @@ void read_regame()
 	//memset(cars, 0, sizeof(cars));
 	creatcar();
 	memset(bullets, 0, sizeof(bullets));
+}
+
+void gameinit_shirenhua()
+{
+	//IMAGE *imgChomperAttack[18];//食人花吃僵尸18帧图片
+	//IMAGE *imgChomperDigest[18];//食人花吃僵尸18帧图片
+
+	char name[64];
+	for (int i = 0; i < 19; i++)//食人花吃僵尸
+	{
+		sprintf_s(name, sizeof(name), "res/zhiwu/ChomperAttack/ChomperAttack%d.bmp", i);
+		if (fileExist(name)) {
+			imgChomperAttack[i] = new IMAGE;
+			loadimage(imgChomperAttack[i], name);
+		}
+		else {
+			break;
+		}
+	}
+
+	for (int i = 0; i < 19; i++)//食人花消化僵尸
+	{
+		sprintf_s(name, sizeof(name), "res/zhiwu/ChomperDigest/ChomperDigest%d.bmp", i);
+		if (fileExist(name)) {
+			imgChomperDigest[i] = new IMAGE;
+			loadimage(imgChomperDigest[i], name);
+		}
+		else {
+			break;
+		}
+	}
+}
+
+void chomper_eating(int x, int y)//此时x,y，即为食人花在植物地图上的位置
+{
+	map[x][y].frameIndex++;
+	int	zhiWuType = map[x][y].type - 1;
+	int	index = map[x][y].frameIndex;
+	if (imgZhiWu[zhiWuType][index] == NULL) {
+		map[x][y].frameIndex = 0;
+		map[x][y].eating = false;
+	}
 }
