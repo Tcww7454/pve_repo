@@ -55,6 +55,8 @@ struct zhiWu {	//植物结构体
 	int timer;	//用于向日葵生成阳光的计时器
 	bool eating;//植物吃僵尸
 	bool digest;//植物的消化状态
+	int digest_timer;//消化的计时器
+	int catchzm;//植物捕捉到的僵尸的索引 为了数据稳定 不应该这么写的，外部修改就容易造成越界，野指针等，发生未定义行为
 };
 
 struct sunShineBall {	//阳光球结构体
@@ -241,6 +243,9 @@ void read_regame();
 
 //食人花吃僵尸的实现
 void chomper_eating(int x,int y);
+
+//食人花消化僵尸的实现
+void chomper_digest(int x, int y);
 
 int main() {
 		
@@ -630,6 +635,8 @@ void updateWindow()
 				int index = map[i][j].frameIndex;
 				if(map[i][j].type==SHI_REN_HUA+1&&map[i][j].eating==true)
 					putimagePNG(map[i][j].x, map[i][j].y, imgChomperAttack[index]);
+				else if(map[i][j].type==SHI_REN_HUA+1 && map[i][j].digest==true)
+					putimagePNG(map[i][j].x, map[i][j].y, imgChomperDigest[index]);
 				//putimagePNG(x, y, imgZhiWu[zhiWuType][index]);
 				else
 				putimagePNG(map[i][j].x, map[i][j].y, imgZhiWu[zhiWuType][index]);
@@ -702,15 +709,6 @@ void updateWindow()
 		}
 	}
 
-	//加载(渲染)阳光
-	for (int i = 0; i < ballMax; i++) {
-		if (balls[i].used /* || balls[i].xoff*/) {
-			IMAGE* img = &imgSunShineBall[balls[i].frameIndex];
-			//putimagePNG(balls[i].x, balls[i].y, img);
-			putimagePNG(balls[i].pCur.x, balls[i].pCur.y, img);
-		}
-	}
-
 	//putimagePNG((235 + 8 * 65), 0, flag == 0 ? &imgpause_one : &imgpause_two);
 	//putimagePNG((235 + 8 * 65), 25, flag == 0 ? imgpause[2] : imgpause[3]);
 	putimagePNG((235 + 8 * 65), 25, imgpause[2]);
@@ -720,6 +718,15 @@ void updateWindow()
 	{
 		if (cars[i].used)
 			putimagePNG(cars[i].x, cars[i].y, &imgCAR);
+	}
+
+	//加载(渲染)阳光
+	for (int i = 0; i < ballMax; i++) {
+		if (balls[i].used /* || balls[i].xoff*/) {
+			IMAGE* img = &imgSunShineBall[balls[i].frameIndex];
+			//putimagePNG(balls[i].x, balls[i].y, img);
+			putimagePNG(balls[i].pCur.x, balls[i].pCur.y, img);
+		}
 	}
 
 	EndBatchDraw();
@@ -796,6 +803,8 @@ void userClick() {
 					map[row][col].y = 179 + row * 102 + 14;
 					map[row][col].eating = false;
 					map[row][col].digest = false;
+					map[row][col].digest_timer = 0;
+					map[row][col].catchzm = -1;
 				}
 			}
 			//使植物释放消失
@@ -828,8 +837,10 @@ void updateGame() {
 		for (int j = 0; j < 9; j++) {
 			if (map[i][j].type > 0) {
 				if(map[i][j].type==SHI_REN_HUA+1 && map[i][j].eating==true) chomper_eating(i,j);
+				else if(map[i][j].type == SHI_REN_HUA + 1 && map[i][j].eating == false && map[i][j].digest==true)  chomper_digest(i, j);
 				else
 				{
+				
 				map[i][j].frameIndex++;
 				int	zhiWuType = map[i][j].type - 1;
 				int	index = map[i][j].frameIndex;
@@ -1298,10 +1309,12 @@ void checkZm2ZhiWu() {
 					{
 						if (x3 <= x2)
 						{
+							map[row][k].catchzm = i;//记录每个食人花要吃的僵尸的索引
 							map[row][k].eating = true;
-							//chomper_eating();
-							zms[i].dead = true;
-							zms[i].used = false;
+						
+								/*zms[i].dead = true;
+								zms[i].used = false;*/
+							
 						}
 					}
 				}
@@ -1532,7 +1545,8 @@ void game_save()
 					<< map[i][j].frameIndex << " " << map[i][j].shootTimer << " "
 					<< map[i][j].timer << " " << map[i][j].type << " "
 					<< map[i][j].x << " " << map[i][j].y<<" "
-					<<map[i][j].eating<<" "<<map[i][j].digest ;
+					<<map[i][j].eating<<" "<<map[i][j].digest<<" "
+					<<map[i][j].digest_timer<<" "<<map[i][j].catchzm;
 			outfile << endl;
 		}
 	}
@@ -1604,7 +1618,8 @@ void read_archive()
 				>> map[i][j].frameIndex >> map[i][j].shootTimer
 				>> map[i][j].timer >> map[i][j].type 
 				>> map[i][j].x >> map[i][j].y 
-				>>map[i][j].eating>>map[i][j].digest;
+				>>map[i][j].eating>>map[i][j].digest
+				>>map[i][j].digest_timer>>map[i][j].catchzm;
 		}
 	}
 
@@ -1802,11 +1817,49 @@ void gameinit_shirenhua()
 
 void chomper_eating(int x, int y)//此时x,y，即为食人花在植物地图上的位置
 {
+	//static int z;//记录当前食人花要吃的僵尸的索引，有问题，当同一时间有多个函数调用时，z可能会被错误访问
+	//for (int i = 0; i < zmMax; i++)
+	//{
+	//	if (zms[i].row == x )
+	//	{
+	//		int zhiWuX = 256 - 112 + y * 81;	//定义僵尸开吃范围
+	//		int x2 = zhiWuX + 60;
+	//		int x3 = zms[i].x + 80;//x3为僵尸的左界
+	//		if (x3 <= x2)
+	//			z = i;
+	//	}
+	//}
+	Sleep(1);
 	map[x][y].frameIndex++;
 	int	zhiWuType = map[x][y].type - 1;
 	int	index = map[x][y].frameIndex;
 	if (imgZhiWu[zhiWuType][index] == NULL) {
 		map[x][y].frameIndex = 0;
 		map[x][y].eating = false;
+		map[x][y].digest = true;
+		zms[map[x][y].catchzm].dead = true;
+		zms[map[x][y].catchzm].used = false;
+		killZmCount++;
+		cout << "杀掉的僵尸数为" << killZmCount << endl;
+		//z = 0;
+	}
+}
+
+void chomper_digest(int x, int y)//此时x,y，即为食人花在植物地图上的位置
+{
+	Sleep(1);
+	map[x][y].frameIndex++;
+	int	zhiWuType = map[x][y].type - 1;
+	int	index = map[x][y].frameIndex;
+	if (imgZhiWu[zhiWuType][index] == NULL) {
+		map[x][y].frameIndex = 0;
+		//map[x][y].eating = false; 
+		//map[x][y].digest = false;
+		map[x][y].digest_timer++;
+	}
+	if (map[x][y].digest_timer > 5)
+	{
+		map[x][y].digest_timer = 0;
+		map[x][y].digest = false;
 	}
 }
