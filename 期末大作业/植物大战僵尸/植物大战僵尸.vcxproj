@@ -23,6 +23,7 @@
     <ProjectGuid>{47743EFF-7BAD-4948-B3FC-F546086019B3}</ProjectGuid>
     <RootNamespace>植物大战僵尸</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>pvecode</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -123,6 +124,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="game.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tools.cpp" />
     <ClCompile Include="vector2.cpp" />
