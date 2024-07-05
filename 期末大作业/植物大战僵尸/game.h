@@ -9,14 +9,16 @@ using namespace std;
 #include<stdio.h>
 #include<mmsystem.h>	//音乐
 #include<fstream> //文件
-#include <setjmp.h>//用于一局游戏退出跳转到主菜单
+#include <setjmp.h>//用于函数间跳转功能的实现 用于一局游戏退出跳转到主菜单
 #include <Windows.h>
+#include<vector>
 
 extern jmp_buf jmpbuffer;
 extern jmp_buf jmpbuffer_two;
+//extern jmp_buf jmpbuffer_three;
 #pragma comment(lib,"winmm.lib") 
 
-enum { WAN_DAO, XIANG_RI_KUI, SHI_REN_HUA, ZHI_WU_COUNT };	//植物枚举
+enum { WAN_DAO, XIANG_RI_KUI, SHI_REN_HUA,CHERRY,WALL_NUT, ZHI_WU_COUNT };	//植物枚举
 enum { SUNSHINE_DOWN, SUNSHINE_GROUND, SUNSHINE_COLLECT, SUNSHINE_PRODUCT };  //阳光球状态枚举
 enum { GOING, WIN, FAIL };
 
@@ -31,9 +33,9 @@ extern IMAGE imgtombstone;
 extern IMAGE *imgChomperAttack[18];//食人花吃僵尸18帧图片
 extern IMAGE *imgChomperDigest[18];//食人花吃僵尸18帧图片
 
+
 extern int curX, curY;	//当前选中植物在移动中的坐标
 extern int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
-
 extern int killZmCount;	//杀掉的僵尸总数
 extern int zmCount;		//生成的僵尸数量
 extern int gameStatus;		//游戏的状态
@@ -57,7 +59,7 @@ struct zhiWu {	//植物结构体
 	bool eating;//植物吃僵尸
 	bool digest;//植物的消化状态
 	int digest_timer;//消化的计时器
-	int catchzm;//植物捕捉到的僵尸的索引 为了数据稳定 不应该这么写的，外部修改就容易造成越界，野指针等，发生未定义行为
+	int catchzm;//植物捕捉到的僵尸的索引 如果为了数据稳定不应该这么写的，外部修改就容易造成越界，野指针等，发生未定义行为
 };
 
 struct sunShineBall {	//阳光球结构体
@@ -66,7 +68,6 @@ struct sunShineBall {	//阳光球结构体
 	int	destY;	//阳光球停止的y坐标
 	bool used;	//阳光球是否在使用
 	int timer;	//计时器，用来限制阳光球最后的停留时间
-
 	int xoff;	//阳光球归位的x坐标
 	int yoff;	//阳光球归位的y坐标
 
@@ -90,6 +91,7 @@ struct zm {		//僵尸结构体	-后期还是需要像植物一样搞个枚举,方便创建不同类型的僵尸
 	int blood;	//僵尸血量
 	bool dead;	//僵尸是否死亡
 	bool eating;	//僵尸是否在吃植物
+	//bool boom;
 };
 
 extern struct zm zms[10];	//僵尸池,用来事先存储僵尸
@@ -247,3 +249,6 @@ void chomper_eating(int x, int y);
 
 //食人花消化僵尸的实现
 void chomper_digest(int x, int y);
+
+//樱桃爆炸 废案
+void cherry_boom(int x,int y);

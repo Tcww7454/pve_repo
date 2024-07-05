@@ -2,6 +2,7 @@
 
 jmp_buf jmpbuffer;
 jmp_buf jmpbuffer_two;
+jmp_buf jmpbuffer_three;
 
 IMAGE imgBg;	//游戏背景图
 IMAGE imgBar;	//状态栏，放植物的背景板
@@ -12,7 +13,7 @@ IMAGE imgpause_two;
 IMAGE *imgpause[9];//总共9张图片，偷个懒，注意每个元素对应哪张图片吧，使用这种方法渲染墓碑图片会访问冲突
 IMAGE imgtombstone;
 IMAGE *imgChomperAttack[18];//食人花吃僵尸18帧图片
-IMAGE *imgChomperDigest[18];//食人花吃僵尸18帧图片
+IMAGE *imgChomperDigest[18];//食人花消化僵尸18帧图片
 
 int curX, curY;	//当前选中植物在移动中的坐标
 int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
@@ -21,10 +22,10 @@ int zmCount;		//生成的僵尸数量
 int gameStatus;		//游戏的状态
 
 struct zm zms[10];	//僵尸池,用来事先存储僵尸
-IMAGE	imgZm[22];
-IMAGE	imgZmDead[20];
-IMAGE	imgZmEat[21];
-IMAGE	imgZmStand[11];
+IMAGE	imgZm[22];	//imgzm是总的 状态数组，用来储存不同状态下的僵尸的图片，这里有以下几种状态
+IMAGE	imgZmDead[20];//僵尸死亡
+IMAGE	imgZmEat[21];//僵尸吃
+IMAGE	imgZmStand[11];//片头巡场僵尸站立
 
  struct sunShineBall	balls[10];	//阳光球池，用来事先存储阳光
  IMAGE	imgSunShineBall[29];	//阳光序列帧总数	-	可以定义一个宏，方便后期管理
@@ -102,6 +103,8 @@ void gameInit() {
 
 	//初始化阳光值
 	sunShine = 50;
+
+
 
 	//加载阳光
 	for (int i = 0; i < 29; i++) {	//29是固定值，可以寻求更匹配的方式
@@ -185,13 +188,15 @@ void gameInit() {
 
 //游戏开始界面实现
 void startUI() {
-	IMAGE imgMenu, imgMenu1, imgMenu2, imgcontinue1, imgcontinue2;
-	int	flag1 = 0, flag2 = 0;//以为开始游戏的图标，2为继续上局游戏的图标
+	IMAGE imgMenu, imgMenu1, imgMenu2, imgcontinue1, imgcontinue2,imgsmallgame1,imgsmallgame2;
+	int	flag1 = 0, flag2 = 0,flag3=0;//以为开始游戏的图标，2为继续上局游戏的图标
 	loadimage(&imgMenu, "res/menu.png");	//加载开始背景图
 	loadimage(&imgMenu1, "res/menu1.png");
 	loadimage(&imgMenu2, "res/menu2.png");
 	loadimage(&imgcontinue1, "res/Screen/continue1.png");
 	loadimage(&imgcontinue2, "res/Screen/continue2.png");
+	loadimage(&imgsmallgame1, "res/reanim/SelectorScreen_Survival_highlight.png");
+	loadimage(&imgsmallgame2, "res/reanim/SelectorScreen_Survival_button.png");
 
 	while (1)
 	{
@@ -200,11 +205,13 @@ void startUI() {
 		putimage(0, 0, &imgMenu);	//渲染开始背景图到窗口上
 		putimagePNG(474, 75, flag1 == 0 ? &imgMenu2 : &imgMenu1);
 		putimagePNG(484, 300, flag2 == 0 ? &imgcontinue2 : &imgcontinue1);
+		putimagePNG(469, 75+120, flag3 == 0 ? &imgsmallgame1 : &imgsmallgame2);
 
 		ExMessage	msg;
 		if (peekmessage(&msg)) {
 			if (msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215)flag1 = 1; else flag1 = 0;
 			if (msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122)flag2 = 1; else flag2 = 0;
+			if (msg.x > 469 && msg.x < 469 + 313 && msg.y>195 && msg.y < 195 + 103)flag3 = 1; else flag3 = 0;
 
 			if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮
 				msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215) {
@@ -214,6 +221,10 @@ void startUI() {
 				msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122) {
 				flag2 = 1;
 
+			}
+			else if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮 286 122
+				msg.x > 469 && msg.x < 469 + 313 && msg.y>195 && msg.y < 195 + 103) {
+				flag3 = 1;
 			}
 		}
 		//WM_LBUTTONUP
@@ -303,7 +314,7 @@ void viewScence() {
 	}
 }
 
-//状态栏下滑实现
+//状态栏下滑实现废案
 //void barsDown() {
 //	int height = imgBar.getheight();
 //	for (int y = -height; y <= 0; y++) {
@@ -533,6 +544,28 @@ void userClick() {
 						sunShine -= 150;
 					}
 				}
+				else if (index == CHERRY)//樱桃
+				{
+					if (sunShine >= 150)
+					{
+						status = 1;
+						curZhiWu = index + 1;
+						curX = msg.x;
+						curY = msg.y;
+						sunShine -= 150;
+					}
+				}
+				else if (index == WALL_NUT)//樱桃
+				{
+					if (sunShine >= 50)
+					{
+						status = 1;
+						curZhiWu = index + 1;
+						curX = msg.x;
+						curY = msg.y;
+						sunShine -= 50;
+					}
+				}
 				//其他的还有待补充
 
 				//status = 1;
@@ -596,8 +629,8 @@ void updateGame() {
 			if (map[i][j].type > 0) {
 				if (map[i][j].type == SHI_REN_HUA + 1 && map[i][j].eating == true) chomper_eating(i, j);
 				else if (map[i][j].type == SHI_REN_HUA + 1 && map[i][j].eating == false && map[i][j].digest == true)  chomper_digest(i, j);
-				else
-				{
+				else if (map[i][j].type == CHERRY + 1) cherry_boom(i, j);
+				else{
 
 					map[i][j].frameIndex++;
 					int	zhiWuType = map[i][j].type - 1;
@@ -611,6 +644,9 @@ void updateGame() {
 		}
 	}
 
+	//更新僵尸动作
+	updateZm();
+
 	//小推车与僵尸的碰撞检测
 	checkcarzm();
 
@@ -619,9 +655,6 @@ void updateGame() {
 
 	//创建僵尸
 	createZm();
-
-	//更新僵尸动作
-	updateZm();
 
 	//创建阳光
 	createSunShine();
@@ -637,6 +670,8 @@ void updateGame() {
 
 	//豌豆子弹与僵尸碰撞
 	collisionCheck();
+
+	
 }
 
 //检测游戏是否结束实现
@@ -662,21 +697,21 @@ bool checkOver() {
 }
 
 //创建阳光实现
-void createSunShine() {
-
+void createSunShine() 
+{
 	static	int	count = 0;
-	static	int	fre = 200;
+	static	int	fre = 500;
 	count++;
 
 	if (count >= fre) {	//限制阳光生成的速度
 
-		fre = 100 + rand() % 150;	//第二次生成阳光的时间随机
+		fre = 300 + rand() % 150;	//第二次生成阳光的时间随机
 		count = 0;
 
 		int i;
 
 		//从阳光池中取出可用的阳光
-		for (i = 0; i < ballMax && balls[i].used; i++);	//别问，问就是一种新定义方式，跟{}一个样
+		for (i = 0; i < ballMax && balls[i].used; i++);	
 		if (i >= ballMax)return;
 
 		balls[i].used = true;
@@ -867,12 +902,12 @@ void createZm() {
 	}
 
 	static	int	count = 0;
-	static	int	zmFre = 500;
+	static	int	zmFre = 300;
 	count++;
 
 	if (count >= zmFre) {	//限制僵尸生成的速度
 
-		zmFre = 300 + rand() % 200;	//第二次生成僵尸的时间随机
+		zmFre = 100 + rand() % 200;	//第二次生成僵尸的时间随机
 		count = 0;
 
 		int i;
@@ -890,6 +925,7 @@ void createZm() {
 		zms[i].blood = 100;
 		zms[i].dead = false;
 		zms[i].eating = false;
+		//zms[i].boom = false;
 
 		zmCount++;
 	}
@@ -918,6 +954,7 @@ void updateZm() {
 	count2++;
 	if (count2 > 4) {	//限制僵尸动作更新速度，避免鬼畜
 		count2 = 0;
+		//setjmp(jmpbuffer_three);
 		for (int i = 0; i < zmMax; i++) {
 			if (zms[i].used) {
 				if (zms[i].dead) {
@@ -1009,6 +1046,8 @@ void collisionCheck() {
 	//僵尸与植物的碰撞检测
 	checkZm2ZhiWu();
 
+	
+
 }
 
 //豌豆子弹与僵尸的碰撞检测实现
@@ -1048,7 +1087,8 @@ void checkZm2ZhiWu() {
 			int x2 = zhiWuX + 60;
 			int x3 = zms[i].x + 80;//x3为僵尸的左界
 
-			if (x3 > x1 && x3 < x2) {
+			if (x3 > x1 && x3 < x2) //进入了僵尸与植物互吃的范围
+			{
 				if (map[row][k].type != SHI_REN_HUA + 1 && map[row][k].catched == true)
 				{	//僵尸吃的过程中的一些配置
 					map[row][k].deadTimer++;
@@ -1074,6 +1114,23 @@ void checkZm2ZhiWu() {
 							zms[i].used = false;*/
 
 						}
+					}
+				}
+				else if (map[row][k].type == WALL_NUT + 1)
+				{
+					map[row][k].catched = true;
+					zms[i].eating = true;
+					zms[i].speed = 0;
+					zms[i].frameIndex = 0;
+					map[row][k].deadTimer++;
+					if (map[row][k].deadTimer > 30000)
+					{	//僵尸吃完了-重置参数
+						
+						zms[i].eating = false;
+						zms[i].frameIndex = 0;
+						zms[i].speed = 1;
+						map[row][k].deadTimer = 0;
+						map[row][k].type = 0;
 					}
 				}
 				else {	//僵尸开吃-配置参数
@@ -1224,7 +1281,6 @@ void useshovel(ExMessage* msg)
 			}
 		}
 	}
-
 }
 
 void clickpause(ExMessage* msg)
@@ -1422,7 +1478,7 @@ void gameinit_pause()
 	//IMAGE *imgpause[10]
 	imgpause[9] = new IMAGE;
 	loadimage(imgpause[9], "res/Screen/pause_0.png");
-	loadimage(&imgtombstone, "res/Screen/pause_0.png");
+	loadimage(&imgtombstone, "res/Screen/pause_1.png");
 
 	for (int i = 0; i < 2; i++)//主菜单
 	{
@@ -1550,7 +1606,7 @@ void gameinit_shirenhua()
 	char name[64];
 	for (int i = 0; i < 19; i++)//食人花吃僵尸
 	{
-		sprintf_s(name, sizeof(name), "res/zhiwu/ChomperAttack/ChomperAttack%d.bmp", i);
+		sprintf_s(name, sizeof(name), "res/zhiwu/ChomperAttack/ChomperAttack%d.png", i);
 		if (fileExist(name)) {
 			imgChomperAttack[i] = new IMAGE;
 			loadimage(imgChomperAttack[i], name);
@@ -1562,7 +1618,7 @@ void gameinit_shirenhua()
 
 	for (int i = 0; i < 19; i++)//食人花消化僵尸
 	{
-		sprintf_s(name, sizeof(name), "res/zhiwu/ChomperDigest/ChomperDigest%d.bmp", i);
+		sprintf_s(name, sizeof(name), "res/zhiwu/ChomperDigest/ChomperDigest%d.png", i);
 		if (fileExist(name)) {
 			imgChomperDigest[i] = new IMAGE;
 			loadimage(imgChomperDigest[i], name);
@@ -1621,3 +1677,85 @@ void chomper_digest(int x, int y)//此时x,y，即为食人花在植物地图上的位置
 		map[x][y].digest = false;
 	}
 }
+
+//樱桃爆炸
+void cherry_boom(int x,int y)
+{
+	static int count = 0;
+	count++;
+	if (count > 1)
+	{
+		count = 0;
+		map[x][y].frameIndex++;
+		int	zhiWuType = map[x][y].type - 1;
+		int	index = map[x][y].frameIndex;
+
+
+		if (imgZhiWu[zhiWuType][index] == NULL) {
+			//for (int i = 0; i < zmMax; i++)
+			//{
+			//		if (zms[i].dead)continue;
+			//		int row = zms[i].row;
+			//		int zhiWuX = 256 - 112 + y * 81;	//定义僵尸开吃范围
+			//		int x1 = zhiWuX + 10;//x1,x2分别为植物的左右界
+			//		int x2 = zhiWuX + 60;
+			//		int x3 = zms[i].x + 80;//x3为僵尸的左界
+			//		if (x3 >= x1 && x3 <= x2)
+			//		{
+			//			//zms[i].blood -= zms[i].blood;
+			//			zms[i].used = true;
+			//			zms[i].dead = true;//僵尸死亡待优化
+			//			zms[i].speed = 0;
+			//			zms[i].frameIndex = 0;
+			//			//longjmp(jmpbuffer_three, 1);
+			//			map[x][y].type = 0;
+			//			/*killZmCount++;
+			//			cout << "杀掉的僵尸数为：" << killZmCount << endl;*/
+			//		}
+			//}
+			for (int i = 0; i < zmMax; i++)
+			{
+				if (zms[i].dead)continue;
+				if (zms[i].used)
+				{
+					int row = zms[i].row;
+					int zhiWuX = 256 - 112 + y * 81;	//定义僵尸开吃范围
+					int x1 = zhiWuX + 10;//x1,x2分别为植物的左右界
+					int x2 = zhiWuX + 60;
+					int x3 = zms[i].x + 80;//x3为僵尸的左界
+					if (x3 >= x1 && x3 <= x2)
+					{
+						zms[i].dead = true;
+						zms[i].frameIndex = 0;
+						//僵尸死亡有bug，待优化
+						IMAGE* img = NULL;
+						img = imgZmDead;
+						 //int count1 = 0;
+						static int count2 = 0;
+						while (zms[i].frameIndex <= 20)
+						{
+							
+							count2++;
+							if (count2 > 10) {	//存在问题
+								count2 = 0;
+								img += zms[i].frameIndex;
+								putimagePNG(zms[i].x, zms[i].y - img->getheight(), img);
+								zms[i].frameIndex++;
+							}
+						}
+
+						zms[i].used = false;
+						killZmCount++;
+						cout << "杀掉的僵尸数为:" << killZmCount << endl;
+					}
+				}
+
+			}
+
+			map[x][y].type = 0;
+		}
+	}
+	
+	
+}
+

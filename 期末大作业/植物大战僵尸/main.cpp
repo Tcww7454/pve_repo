@@ -10,9 +10,7 @@ int main() {
 
 	setjmp(jmpbuffer_two);
 	//viewScence();	//场景巡场
-
 	//barsDown();	//状态栏下滑
-
 
 	//双缓冲，先将要绘制的内容一次性绘制在图片上，再把图片输出，避免不断从内存读取数据而导致的屏幕闪烁
 	//主要由BeginBatchDraw()、EndBatchDraw()、FlushBatchDraw()组成
@@ -20,7 +18,6 @@ int main() {
 
 	int timer = 0;
 	bool flag = true;
-
 	while (1)
 	{
 		userClick();	//获取用户点击事件

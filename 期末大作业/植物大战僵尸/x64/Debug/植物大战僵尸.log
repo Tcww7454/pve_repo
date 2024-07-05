@@ -1,21 +1,11 @@
-﻿  main.cpp
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(102): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: 参见“fopen”的声明
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(193): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(196): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(195): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(170): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  e:\windows kits\10\include\10.0.17763.0\ucrt\string.h(133): note: 参见“strcpy”的声明
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(246): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(334): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(335): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(348): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(350): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(435): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(437): warning C4244: “初始化”: 从“__int64”转换到“float”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(438): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(465): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(465): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(466): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(466): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-c:\users\asus\desktop\植物大战僵尸\植物大战僵尸\植物大战僵尸\main.cpp(468): warning C4305: “=”: 从“double”到“float”截断
+﻿D:\visal studio\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: 中间目录(x64\Debug\)包含从另一个项目(植物大战僵尸.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+x64\Debug\game.obj : warning LNK4042: 对象被多次指定；已忽略多余的指定
+main.obj : error LNK2019: 无法解析的外部符号 "void __cdecl gameInit(void)" (?gameInit@@YAXXZ)，该符号在函数 main 中被引用
+main.obj : error LNK2019: 无法解析的外部符号 "void __cdecl startUI(void)" (?startUI@@YAXXZ)，该符号在函数 main 中被引用
+main.obj : error LNK2019: 无法解析的外部符号 "void __cdecl updateWindow(void)" (?updateWindow@@YAXXZ)，该符号在函数 main 中被引用
+main.obj : error LNK2019: 无法解析的外部符号 "void __cdecl userClick(void)" (?userClick@@YAXXZ)，该符号在函数 main 中被引用
+main.obj : error LNK2019: 无法解析的外部符号 "void __cdecl updateGame(void)" (?updateGame@@YAXXZ)，该符号在函数 main 中被引用
+main.obj : error LNK2019: 无法解析的外部符号 "bool __cdecl checkOver(void)" (?checkOver@@YA_NXZ)，该符号在函数 main 中被引用
+main.obj : error LNK2001: 无法解析的外部符号 "struct _SETJMP_FLOAT128 * jmpbuffer" (?jmpbuffer@@3PAU_SETJMP_FLOAT128@@A)
+main.obj : error LNK2001: 无法解析的外部符号 "struct _SETJMP_FLOAT128 * jmpbuffer_two" (?jmpbuffer_two@@3PAU_SETJMP_FLOAT128@@A)
+C:\Users\ASUS\Desktop\pvecode2\pve_repo\期末大作业\x64\Debug\pvecode.exe : fatal error LNK1120: 8 个无法解析的外部命令
