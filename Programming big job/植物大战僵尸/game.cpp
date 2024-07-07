@@ -1,5 +1,6 @@
 #include"game.h"
 
+
 jmp_buf jmpbuffer;
 jmp_buf jmpbuffer_two;
 jmp_buf jmpbuffer_three;
@@ -191,9 +192,9 @@ void gameInit() {
 
 //游戏开始界面实现
 void startUI() {
-	IMAGE imgMenu, imgMenu1, imgMenu2, imgcontinue1, imgcontinue2,imgsmallgame1,imgsmallgame2;
+	IMAGE imgMenu, imgMenu1, imgMenu2, imgcontinue1, imgcontinue2,imgsmallgame1,imgsmallgame2,imgExit2,imgExit1;
 	int	flag1 = 0, flag2 = 0,flag3=0;//以为开始游戏的图标，2为继续上局游戏的图标
-	int flag4 = 0,flag5=0;
+	int flag4 = 0, flag5 = 0, flag6 = 0;
 	loadimage(&imgMenu, "res/menu.png");	//加载开始背景图
 	loadimage(&imgMenu1, "res/menu1.png");
 	loadimage(&imgMenu2, "res/menu2.png");
@@ -201,6 +202,8 @@ void startUI() {
 	loadimage(&imgcontinue2, "res/Screen/continue2.png");
 	loadimage(&imgsmallgame1, "res/reanim/SelectorScreen_Survival_highlight.png");
 	loadimage(&imgsmallgame2, "res/reanim/SelectorScreen_Survival_button.png");
+	loadimage(&imgExit2, "res/pause/SelectorScreen_Quit2.png");//退出初始选项
+	loadimage(&imgExit1, "res/pause/SelectorScreen_Quit1.png");//退出移动鼠标后按键
 	//登录系统四张图片的初始化
 	init_loadimage();
 
@@ -215,12 +218,8 @@ void startUI() {
 		putimagePNG(60, 0, imgloadacount[1]);
 		putimagePNG(60, 140, flag4 == 1 ? imgloadacount[2] : imgloadacount[3]);
 		//putimagePNG(60, 70, imgloadacount[0]);
-
-		setcolor(character_color);						//账户字体颜色
-		
+		putimagePNG(800, 500, flag6 == 0 ? &imgExit2 : &imgExit1);
 		outtextxy(110, 86, "Tcww");
-		
-		setcolor(BLACK);
 
 		ExMessage	msg;
 		if (peekmessage(&msg)) {
@@ -228,6 +227,7 @@ void startUI() {
 			if (msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122)flag2 = 1; else flag2 = 0;
 			if (msg.x > 469 && msg.x < 469 + 313 && msg.y>195 && msg.y < 195 + 103)flag3 = 1; else flag3 = 0;
 			if (msg.x > 60 && msg.x < 60 + 290 && msg.y>140 && msg.y < 140 + 70)flag4 = 1; else flag4 = 0;
+			if (msg.x > 800 && msg.x < 870 && msg.y>500 && msg.y < 540)flag6 = 1; else flag6 = 0;
 
 			if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮
 				msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215) {
@@ -242,13 +242,18 @@ void startUI() {
 				msg.x > 469 && msg.x < 469 + 313 && msg.y>195 && msg.y < 195 + 103) {
 				flag3 = 1;
 			}
+			else if (msg.message == WM_LBUTTONUP &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮 286 122
+				msg.x > 800 && msg.x < 870 && msg.y>500 && msg.y < 540) {
+				exit(0);
+			}
+
 			else if (msg.message == WM_LBUTTONDOWN &&	//登录，账号创建
 				msg.x > 60 && msg.x < 60 + 290 && msg.y>140 && msg.y < 140 + 70) {
 				//putimagePNG(280, 150, imgloadacount[0]);
 				flag4 = 1;
 				flag5 = 1; 
 				
-				account_manage();
+				account_manage(flag5);
 			}
 		}
 		//WM_LBUTTONUP
@@ -579,7 +584,7 @@ void userClick() {
 						//sunShine -= 150;
 					}
 				}
-				else if (index == WALL_NUT)//樱桃
+				else if (index == WALL_NUT)//坚果墙
 				{
 					if (sunShine >= 50)
 					{
@@ -620,7 +625,7 @@ void userClick() {
 					plant_map[row][col].digest = false;
 					plant_map[row][col].digest_timer = 0;
 					plant_map[row][col].catchzm = -1;
-					plant_map[row][col].deadTimer = 0;
+
 					//enum { WAN_DAO, XIANG_RI_KUI, SHI_REN_HUA, CHERRY, WALL_NUT, ZHI_WU_COUNT };	//植物枚举
 					//将阳光值减少移植到这
 					if (plant_map[row][col].type == WAN_DAO + 1)	sunShine -= 100;
@@ -719,17 +724,26 @@ void updateGame() {
 bool checkOver() {
 	BeginBatchDraw();
 
+	IMAGE imgEnd1,imgEnd2;
+
 	bool ret = false;
 
 	if (gameStatus == WIN) {
 		Sleep(100);
-		loadimage(0, "res/gameWin.png");
+		loadimage(0, "res/bg.jpg");
+		loadimage(&imgEnd1, "res/check_over/win.png");
+		putimage(-112, 0, &imgBg);
+		putimagePNG(300, 130, &imgEnd1);
 		mciSendString("play res/win.mp3", 0, 0, 0);
 		ret = true;
 	}
 	else if (gameStatus == FAIL) {
 		Sleep(100);
-		loadimage(0, "res/gameFail.png");
+		loadimage(0, "res/bg.jpg");
+		loadimage(0, "res/check_over/lose.png");
+		loadimage(&imgEnd2, "res/check_over/lose.png");
+		putimage(-112, 0, &imgBg);
+		putimagePNG(300,130, &imgEnd2);
 		mciSendString("play res/lose.mp3", 0, 0, 0);
 		ret = true;
 	}
@@ -967,7 +981,6 @@ void createZm() {
 		zms[i].blood = 100;
 		zms[i].dead = false;
 		zms[i].eating = false;
-		zms[i].catched = -1;//僵尸捕捉到达植物在本行的索引，植物的横轴索引与僵尸一致
 		//zms[i].boom = false;
 
 		zmCount++;
@@ -1012,12 +1025,6 @@ void updateZm() {
 					}
 				}
 				else if (zms[i].eating) {
-					if (plant_map[zms[i].row][zms[i].catched].type == 0)
-					{
-						zms[i].eating = false;
-						zms[i].speed = zm_speed;
-					}
-						
 					zms[i].frameIndex = (zms[i].frameIndex + 1) % 20;
 				}
 				else
@@ -1107,7 +1114,7 @@ void checkBullet2Zm() {
 			int x2 = zms[j].x + 110;
 			int x = bullets[i].x;
 			if (zms[j].dead == false && bullets[i].row == zms[j].row && x > x1 && x < x2) {	//豌豆子弹与僵尸碰撞后
-				zms[j].blood -= pea_bullet_damage;//5;//10;//20;
+				zms[j].blood -= 30;//5;//10;//20;
 				bullets[i].blast = true;
 				bullets[i].speed = 0;
 
@@ -1136,11 +1143,11 @@ void checkZm2ZhiWu() {
 
 			if (x3 > x1 && x3 < x2) //进入了僵尸与植物互吃的范围
 			{
-				zms[i].catched = k;//记录僵尸捕捉到的植物在这一行的索引
-				if (plant_map[row][k].type != SHI_REN_HUA + 1 && plant_map[row][k].catched == true&& plant_map[row][k].type!=WALL_NUT+1)
+				if (plant_map[row][k].type != SHI_REN_HUA + 1 && plant_map[row][k].catched == true
+					&& plant_map[row][k].type != WALL_NUT + 1)
 				{	//僵尸吃的过程中的一些配置
 					plant_map[row][k].deadTimer++;
-					if (plant_map[row][k].deadTimer > normal_plant_blood)
+					if (plant_map[row][k].deadTimer > 100)
 					{	//僵尸吃完了-重置参数
 						plant_map[row][k].deadTimer = 0;
 						plant_map[row][k].type = 0;
@@ -1157,8 +1164,10 @@ void checkZm2ZhiWu() {
 						{
 							plant_map[row][k].catchzm = i;//记录每个食人花要吃的僵尸的索引
 							plant_map[row][k].eating = true;
+
 							/*zms[i].dead = true;
 							zms[i].used = false;*/
+
 						}
 					}
 				}
@@ -1167,15 +1176,15 @@ void checkZm2ZhiWu() {
 					plant_map[row][k].catched = true;
 					zms[i].eating = true;
 					zms[i].speed = 0;
-					//zms[i].frameIndex = 0;
+					/*zms[i].frameIndex = 0;*/
 					plant_map[row][k].deadTimer++;
-					if (plant_map[row][k].deadTimer > wallnut_plant_blood)
+					if (plant_map[row][k].deadTimer > 1000)
 					{	//僵尸吃完了-重置参数
 						
 						zms[i].eating = false;
 						zms[i].frameIndex = 0;
 						zms[i].speed = zm_speed;
-						//plant_map[row][k].deadTimer = 0;
+						plant_map[row][k].deadTimer = 0;
 						plant_map[row][k].type = 0;
 					}
 				}
@@ -1267,7 +1276,7 @@ void creat_front()
 	//创建小推车
 	//creatcar();
 	/*破案了，之前sb逻辑看错了，小推车只在游戏开始时创建一次，之后不再创建，
-	如果把其放在updategame()函数里面，会不断创建小推车，导致动一次就不再动，再动得僵尸再接触，且无法杀死僵尸*/
+	如果把其放在updategame()函数里面，会不断更新小推车状态，导致动一次就不再动，再动得僵尸再接触，且无法杀死僵尸*/
 	creatshovel();
 }
 
@@ -1413,7 +1422,6 @@ void game_save()
 				<< plant_map[i][j].x << " " << plant_map[i][j].y << " "
 				<< plant_map[i][j].eating << " " << plant_map[i][j].digest << " "
 				<< plant_map[i][j].digest_timer << " " << plant_map[i][j].catchzm;
-			
 			outfile << endl;
 		}
 	}
@@ -1425,7 +1433,7 @@ void game_save()
 			<< zms[i].eating << " " << zms[i].frameIndex << " "
 			<< zms[i].row << " " << zms[i].speed << " "
 			<< zms[i].used << " " << zms[i].x << " "
-			<< zms[i].y << " "<<zms[i].catched;
+			<< zms[i].y << " ";
 		outfile << endl;
 	}
 
@@ -1487,7 +1495,6 @@ void read_archive()
 				>> plant_map[i][j].x >> plant_map[i][j].y
 				>> plant_map[i][j].eating >> plant_map[i][j].digest
 				>> plant_map[i][j].digest_timer >> plant_map[i][j].catchzm;
-			
 		}
 	}
 
@@ -1498,7 +1505,7 @@ void read_archive()
 			>> zms[i].eating >> zms[i].frameIndex
 			>> zms[i].row >> zms[i].speed
 			>> zms[i].used >> zms[i].x
-			>> zms[i].y>>zms[i].catched;
+			>> zms[i].y;
 
 	}
 
@@ -1824,7 +1831,7 @@ void init_loadimage()
 }
 
 //账户的管理
-void account_manage()
+void account_manage(int &flag2)
 {
 	ExMessage	msg;
 	bool running = true;
@@ -1835,23 +1842,25 @@ void account_manage()
 		BeginBatchDraw();//循环内渲染图片需要刷新缓冲区，故此处需要使用该函数
 		//putimagePNG(60, 70, imgloadacount[0]);
 		//渲染有问题，存在黑边
+		if (flag2 == 1)
 			putimagePNG(60, 70, imgloadacount[0]);
 		
 		if (peekmessage(&msg))
 		{
 			if (msg.x > 367-80 && msg.x < 560-100 && msg.y>490-20 && msg.y < 535-20 && msg.message == WM_LBUTTONDOWN)
 			{
-				
+				flag2 = 0;
 				running = false;
-			} 
-			else if (msg.x > 367 - 80 - 210 && msg.x < 560 - 100 - 210
-				&& msg.y>490 - 20 && msg.y < 535 - 20 && msg.message == WM_LBUTTONDOWN)
-			{
-				running = false;
-			}
+			} 				
 		}
 		EndBatchDraw();
 	}
+	
+
+	////加载(渲染)阳光值
+	//char accounnt[100];
+	//sprintf_s(accounnt, sizeof(accounnt), "%d", sunShine);	//把阳光值转换成字符类型
+	//outtextxy(110, 60, accounnt);			//渲染输出	位置可调整成居中,而不使用固定值y	255-283 80-108
 
 
 
