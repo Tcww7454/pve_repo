@@ -12,8 +12,7 @@ using namespace std;
 #include<fstream> //文件
 #include <setjmp.h>//用于函数间跳转功能的实现 用于一局游戏退出跳转到主菜单
 #include <Windows.h>
-#include<vector>
-//#include<opencv2/imgproc/types_c.h>//opencv，启动(启动不了一点，下次重头做时再用)
+//#include<opencv2/imgproc/types_c.h>//opencv，启动(启动不了一点，下次做新做时再用)
 //#include<opencv2/opencv.hpp>
 
 //定义全局常量来替换部分数据，比如僵尸速度，阳光生产速率，植物血量等
@@ -28,6 +27,8 @@ using namespace std;
 #define character_color WHITE//设置账户字体颜色
 #define zm_MAX 10//僵尸池的大小
 #define pea_bullet_damage 10//豌豆子弹伤害
+#define normal_plant_blood 100//普通植物的血量
+#define wallnut_plant_blood 1000//坚果植物的血量
 
 extern jmp_buf jmpbuffer;
 extern jmp_buf jmpbuffer_two;
@@ -65,7 +66,7 @@ extern int gameStatus;		//游戏的状态
 #define ZM_MAX 10	//僵尸总数
 
 struct zhiWu {	//植物结构体
-	int type;		//0-没有植物，1-第一种植物
+	int type;		//0-没有植物，其他分别对应植物枚举
 	int frameIndex;	//序列帧的序号
 	int shootTimer;	//植物攻击时间间隔
 	bool catched;	//植物是否被僵尸捕获

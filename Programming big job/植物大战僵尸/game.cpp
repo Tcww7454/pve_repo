@@ -1140,7 +1140,7 @@ void checkZm2ZhiWu() {
 				if (plant_map[row][k].type != SHI_REN_HUA + 1 && plant_map[row][k].catched == true&& plant_map[row][k].type!=WALL_NUT+1)
 				{	//僵尸吃的过程中的一些配置
 					plant_map[row][k].deadTimer++;
-					if (plant_map[row][k].deadTimer > 100)
+					if (plant_map[row][k].deadTimer > normal_plant_blood)
 					{	//僵尸吃完了-重置参数
 						plant_map[row][k].deadTimer = 0;
 						plant_map[row][k].type = 0;
@@ -1169,7 +1169,7 @@ void checkZm2ZhiWu() {
 					zms[i].speed = 0;
 					//zms[i].frameIndex = 0;
 					plant_map[row][k].deadTimer++;
-					if (plant_map[row][k].deadTimer > 1000)
+					if (plant_map[row][k].deadTimer > wallnut_plant_blood)
 					{	//僵尸吃完了-重置参数
 						
 						zms[i].eating = false;
