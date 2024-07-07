@@ -14,6 +14,7 @@ IMAGE *imgpause[9];//总共9张图片，偷个懒，注意每个元素对应哪张图片吧，使用这种方
 IMAGE imgtombstone;
 IMAGE *imgChomperAttack[18];//食人花吃僵尸18帧图片
 IMAGE *imgChomperDigest[18];//食人花消化僵尸18帧图片
+IMAGE *imgloadacount[4];//系统的登录(没时间写了，套个皮)
 
 int curX, curY;	//当前选中植物在移动中的坐标
 int curZhiWu;	//当前选中的植物	0-没有选中，1-选中第一种植物
@@ -49,7 +50,7 @@ int bulletMax = sizeof(bullets) / sizeof(bullets[0]);	//豌豆子弹池的总数
 
 int carmax = sizeof(cars) / sizeof(cars[0]);//小推车总数
 
-struct zhiWu map[3][9];	//地图数组，方便存储植物
+struct zhiWu plant_map[3][9];	//地图数组，方便存储植物
 
 int sunShine=50;	//阳光值
 
@@ -71,7 +72,7 @@ void gameInit() {
 
 	memset(imgZhiWu, 0, sizeof(imgZhiWu));	//给指针赋空值
 
-	memset(map, 0, sizeof(map));	//初始化地图数组
+	memset(plant_map, 0, sizeof(plant_map));	//初始化地图数组
 
 	memset(balls, 0, sizeof(balls));	//初始化阳光池
 
@@ -182,6 +183,8 @@ void gameInit() {
 	//封装一个只需要在游戏开始时创建的物品的函数，这里只有小推车与铲子的创建函数
 	creat_front();
 
+	
+
 	/*loadimage(&imgBulletBlast[i], "res/bullets/bullet_blast.png",
 		imgBulletBlast[3].getwidth() * k, imgBulletBlast[3].getheight() * k, true);*/
 }
@@ -190,6 +193,7 @@ void gameInit() {
 void startUI() {
 	IMAGE imgMenu, imgMenu1, imgMenu2, imgcontinue1, imgcontinue2,imgsmallgame1,imgsmallgame2;
 	int	flag1 = 0, flag2 = 0,flag3=0;//以为开始游戏的图标，2为继续上局游戏的图标
+	int flag4 = 0,flag5=0;
 	loadimage(&imgMenu, "res/menu.png");	//加载开始背景图
 	loadimage(&imgMenu1, "res/menu1.png");
 	loadimage(&imgMenu2, "res/menu2.png");
@@ -197,6 +201,8 @@ void startUI() {
 	loadimage(&imgcontinue2, "res/Screen/continue2.png");
 	loadimage(&imgsmallgame1, "res/reanim/SelectorScreen_Survival_highlight.png");
 	loadimage(&imgsmallgame2, "res/reanim/SelectorScreen_Survival_button.png");
+	//登录系统四张图片的初始化
+	init_loadimage();
 
 	while (1)
 	{
@@ -206,12 +212,17 @@ void startUI() {
 		putimagePNG(474, 75, flag1 == 0 ? &imgMenu2 : &imgMenu1);
 		putimagePNG(484, 300, flag2 == 0 ? &imgcontinue2 : &imgcontinue1);
 		putimagePNG(469, 75+120, flag3 == 0 ? &imgsmallgame1 : &imgsmallgame2);
+		putimagePNG(60, 0, imgloadacount[1]);
+		putimagePNG(60, 140, flag4 == 1 ? imgloadacount[2] : imgloadacount[3]);
+		//putimagePNG(60, 70, imgloadacount[0]);
+		outtextxy(110, 86, "Tcww");
 
 		ExMessage	msg;
 		if (peekmessage(&msg)) {
 			if (msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215)flag1 = 1; else flag1 = 0;
 			if (msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122)flag2 = 1; else flag2 = 0;
 			if (msg.x > 469 && msg.x < 469 + 313 && msg.y>195 && msg.y < 195 + 103)flag3 = 1; else flag3 = 0;
+			if (msg.x > 60 && msg.x < 60 + 290 && msg.y>140 && msg.y < 140 + 70)flag4 = 1; else flag4 = 0;
 
 			if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮
 				msg.x > 474 && msg.x < 774 && msg.y>75 && msg.y < 215) {
@@ -225,6 +236,14 @@ void startUI() {
 			else if (msg.message == WM_LBUTTONDOWN &&	//鼠标左键落下		扩展：当鼠标经过时也可以高亮 286 122
 				msg.x > 469 && msg.x < 469 + 313 && msg.y>195 && msg.y < 195 + 103) {
 				flag3 = 1;
+			}
+			else if (msg.message == WM_LBUTTONDOWN &&	//登录，账号创建
+				msg.x > 60 && msg.x < 60 + 290 && msg.y>140 && msg.y < 140 + 70) {
+				//putimagePNG(280, 150, imgloadacount[0]);
+				flag4 = 1;
+				flag5 = 1; 
+				
+				account_manage(flag5);
 			}
 		}
 		//WM_LBUTTONUP
@@ -393,21 +412,21 @@ void updateWindow()
 	//在地图上加载(渲染)植物
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 9; j++) {
-			if (map[i][j].type > 0) {
+			if (plant_map[i][j].type > 0) {
 				//int x = 256 + j * 81;
 				//int y = 179 + i * 102 + 14;
-				int zhiWuType = map[i][j].type - 1;
-				int index = map[i][j].frameIndex;
+				int zhiWuType = plant_map[i][j].type - 1;
+				int index = plant_map[i][j].frameIndex;
 				//图片大小导致的y值的适当调整，当然你也可以去裁剪图片()
-				if (map[i][j].type == SHI_REN_HUA + 1 && map[i][j].eating == true)
-					putimagePNG(map[i][j].x, map[i][j].y - 20, imgChomperAttack[index]);
-				else if (map[i][j].type == SHI_REN_HUA + 1 && map[i][j].digest == true)
-					putimagePNG(map[i][j].x, map[i][j].y - 20, imgChomperDigest[index]);
-				else if (map[i][j].type == SHI_REN_HUA + 1)
-					putimagePNG(map[i][j].x, map[i][j].y - 20, imgZhiWu[zhiWuType][index]);
+				if (plant_map[i][j].type == SHI_REN_HUA + 1 && plant_map[i][j].eating == true)
+					putimagePNG(plant_map[i][j].x, plant_map[i][j].y - 20, imgChomperAttack[index]);
+				else if (plant_map[i][j].type == SHI_REN_HUA + 1 && plant_map[i][j].digest == true)
+					putimagePNG(plant_map[i][j].x, plant_map[i][j].y - 20, imgChomperDigest[index]);
+				else if (plant_map[i][j].type == SHI_REN_HUA + 1)
+					putimagePNG(plant_map[i][j].x, plant_map[i][j].y - 20, imgZhiWu[zhiWuType][index]);
 				//putimagePNG(x, y, imgZhiWu[zhiWuType][index]);
 				else
-					putimagePNG(map[i][j].x, map[i][j].y, imgZhiWu[zhiWuType][index]);
+					putimagePNG(plant_map[i][j].x, plant_map[i][j].y, imgZhiWu[zhiWuType][index]);
 			}
 		}
 	}
@@ -513,7 +532,7 @@ void userClick() {
 				int index = (msg.x - 163) / 65;
 
 				//判断阳光值是否足够购买植物
-				//待优化，应该种下后再减的
+				//待优化，应该种下后再减的		移植到鼠标左键按下时
 				if (index == XIANG_RI_KUI) {
 					if (sunShine >= 50) {
 						status = 1;
@@ -521,7 +540,7 @@ void userClick() {
 						//使植物显示在点击位置，避免了植物出现在上次消失位置的小bug
 						curX = msg.x;
 						curY = msg.y;
-						sunShine -= 50;
+						//sunShine -= 50;
 					}
 				}
 				else if (index == WAN_DAO) {
@@ -531,7 +550,7 @@ void userClick() {
 						//使植物显示在点击位置，避免了植物出现在上次消失位置的小bug
 						curX = msg.x;
 						curY = msg.y;
-						sunShine -= 100;
+						//sunShine -= 100;
 					}
 				}
 				else if (index == SHI_REN_HUA) {
@@ -541,7 +560,7 @@ void userClick() {
 						//使植物显示在点击位置，避免了植物出现在上次消失位置的小bug
 						curX = msg.x - 25;//由图片大小导致的坐标差
 						curY = msg.y - 60;
-						sunShine -= 150;
+						//sunShine -= 150;
 					}
 				}
 				else if (index == CHERRY)//樱桃
@@ -552,7 +571,7 @@ void userClick() {
 						curZhiWu = index + 1;
 						curX = msg.x;
 						curY = msg.y;
-						sunShine -= 150;
+						//sunShine -= 150;
 					}
 				}
 				else if (index == WALL_NUT)//樱桃
@@ -563,7 +582,7 @@ void userClick() {
 						curZhiWu = index + 1;
 						curX = msg.x;
 						curY = msg.y;
-						sunShine -= 50;
+						//sunShine -= 50;
 					}
 				}
 				//其他的还有待补充
@@ -585,17 +604,25 @@ void userClick() {
 			if (msg.x > 256 - 112 && msg.x < 900 - 30 && msg.y > 179 && msg.y < 489) {
 				int	row = (msg.y - 179) / 102;	//获取行
 				int	col = (msg.x - 256 + 112) / 81;	//获取列
-				if (map[row][col].type == 0) {
-					map[row][col].type = curZhiWu;	//给鼠标当前行种下植物
-					map[row][col].frameIndex = 0;	//渲染植物第一帧
-					map[row][col].shootTimer = 0;	//初始化发射时间
+				if (plant_map[row][col].type == 0) {
+					plant_map[row][col].type = curZhiWu;	//给鼠标当前行种下植物
+					plant_map[row][col].frameIndex = 0;	//渲染植物第一帧
+					plant_map[row][col].shootTimer = 0;	//初始化发射时间
 
-					map[row][col].x = 256 - 112 + col * 81;	//植物坐标
-					map[row][col].y = 179 + row * 102 + 14;
-					map[row][col].eating = false;
-					map[row][col].digest = false;
-					map[row][col].digest_timer = 0;
-					map[row][col].catchzm = -1;
+					plant_map[row][col].x = 256 - 112 + col * 81;	//植物坐标
+					plant_map[row][col].y = 179 + row * 102 + 14;
+					plant_map[row][col].eating = false;
+					plant_map[row][col].digest = false;
+					plant_map[row][col].digest_timer = 0;
+					plant_map[row][col].catchzm = -1;
+
+					enum { WAN_DAO, XIANG_RI_KUI, SHI_REN_HUA, CHERRY, WALL_NUT, ZHI_WU_COUNT };	//植物枚举
+					//将阳光值减少移植到这
+					if (plant_map[row][col].type == WAN_DAO + 1)	sunShine -= 100;
+					else if (plant_map[row][col].type == XIANG_RI_KUI + 1)	sunShine -= 50;
+					else if (plant_map[row][col].type == SHI_REN_HUA + 1)	sunShine -= 150;
+					else if (plant_map[row][col].type == CHERRY + 1)	sunShine -=150;
+					else if (plant_map[row][col].type == WALL_NUT + 1)	sunShine -= 50;
 				}
 			}
 			//使植物释放消失
@@ -626,17 +653,26 @@ void updateGame() {
 	//更新植物动作
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 9; j++) {
-			if (map[i][j].type > 0) {
-				if (map[i][j].type == SHI_REN_HUA + 1 && map[i][j].eating == true) chomper_eating(i, j);
-				else if (map[i][j].type == SHI_REN_HUA + 1 && map[i][j].eating == false && map[i][j].digest == true)  chomper_digest(i, j);
-				else if (map[i][j].type == CHERRY + 1) cherry_boom(i, j);
+			if (plant_map[i][j].type > 0) {
+				if (plant_map[i][j].type == SHI_REN_HUA + 1 && plant_map[i][j].eating == true) chomper_eating(i, j);
+				else if (plant_map[i][j].type == SHI_REN_HUA + 1 && plant_map[i][j].eating == false && plant_map[i][j].digest == true)  chomper_digest(i, j);
+				else if (plant_map[i][j].type == CHERRY + 1) cherry_boom(i, j);
 				else{
+					/*static int count = 0;
+					count++;
+					if (count > 1)
+					{
+						count = 0;
+						
+					}*/
+					plant_map[i][j].frameIndex++;
+					/*plant_map[i][j].frameIndex--;
+					plant_map[i][j].frameIndex++;*/
 
-					map[i][j].frameIndex++;
-					int	zhiWuType = map[i][j].type - 1;
-					int	index = map[i][j].frameIndex;
+					int	zhiWuType = plant_map[i][j].type - 1;
+					int	index = plant_map[i][j].frameIndex;
 					if (imgZhiWu[zhiWuType][index] == NULL) {
-						map[i][j].frameIndex = 0;
+						plant_map[i][j].frameIndex = 0;
 					}
 
 				}
@@ -736,10 +772,10 @@ void createSunShine()
 	//向日葵生产阳光
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 9; j++) {
-			if (map[i][j].type == XIANG_RI_KUI + 1) {
-				map[i][j].timer++;
-				if (map[i][j].timer > 200) {
-					map[i][j].timer = 0;
+			if (plant_map[i][j].type == XIANG_RI_KUI + 1) {
+				plant_map[i][j].timer++;
+				if (plant_map[i][j].timer > sunshine_product_speed) {//更改此处的宏定义可以改变生产的速度
+					plant_map[i][j].timer = 0;
 
 					int k;
 					for (k = 0; k < ballMax && balls[k].used; k++);
@@ -747,9 +783,9 @@ void createSunShine()
 
 					balls[k].used = true;
 
-					balls[k].p1 = vector2(map[i][j].x, map[i][j].y);	//设置贝塞尔曲线的参数
-					int w = (50 + rand() % 51) * (rand() % 2 ? 1 : -1);
-					balls[k].p4 = vector2(map[i][j].x + w, map[i][j].y + imgZhiWu[XIANG_RI_KUI][0]->getheight()
+					balls[k].p1 = vector2(plant_map[i][j].x, plant_map[i][j].y);	//设置贝塞尔曲线的参数
+					int w = (50 + rand() % 51) * (rand() % 2 ? 1 : -1);//随机左右生产出阳光
+					balls[k].p4 = vector2(plant_map[i][j].x + w, plant_map[i][j].y + imgZhiWu[XIANG_RI_KUI][0]->getheight()
 						- imgSunShineBall->getheight());
 					balls[k].p2 = vector2(balls[k].p1.x + w * 0.3, balls[k].p1.y - 100);
 					balls[k].p3 = vector2(balls[k].p1.x + w * 0.7, balls[k].p1.y - 150);
@@ -795,7 +831,8 @@ void updateSunShine() {
 			}
 			else if (balls[i].status == SUNSHINE_COLLECT) {
 				struct sunShineBall* sun = &balls[i];
-				sun->t += sun->speed;
+				sun->t += sunshine_collect_speed;//通过更改sunshine_collect_speed的大小可以修改阳光收集的速度
+				//sun->t += sun->speed;
 				sun->pCur = sun->p1 + sun->t * (sun->p4 - sun->p1);
 				if (sun->t > 1) {
 					sunShine += 25;
@@ -921,7 +958,7 @@ void createZm() {
 		zms[i].x = WIN_WIDTH;
 		zms[i].row = rand() % 3;
 		zms[i].y = 172 + (zms[i].row + 1) * 100;
-		zms[i].speed = 3;
+		zms[i].speed = zm_speed;
 		zms[i].blood = 100;
 		zms[i].dead = false;
 		zms[i].eating = false;
@@ -963,7 +1000,7 @@ void updateZm() {
 						zms[i].used = false;
 						killZmCount++;
 						cout << "杀掉的僵尸数：" << killZmCount << endl;
-						if (killZmCount == ZM_MAX) {
+						if (killZmCount >= ZM_MAX) {
 							gameStatus = WIN;
 						}
 					}
@@ -993,10 +1030,11 @@ void createBullets() {
 	}
 	for (int i = 0; i < 3; i++) {	//3和9固定值，扩展性差，还是建议宏定义
 		for (int j = 0; j < 9; j++) {
-			if (lines[i] && map[i][j].type == 1) {	//有豌豆且僵尸走到打击范围
-				map[i][j].shootTimer++;
-				if (map[i][j].shootTimer > 20) {
-					map[i][j].shootTimer = 0;
+			if (lines[i] && plant_map[i][j].type == 1) {	//有豌豆且僵尸走到打击范围
+				plant_map[i][j].shootTimer++;
+				if (plant_map[i][j].shootTimer > wandou_bullet_product_speed) {
+					plant_map[i][j].shootTimer = 0;
+					plant_map[i][j].frameIndex = 3;
 					int k;
 					for (k = 0; k < bulletMax && bullets[k].used; k++);
 					if (k >= bulletMax) return;
@@ -1045,9 +1083,6 @@ void collisionCheck() {
 
 	//僵尸与植物的碰撞检测
 	checkZm2ZhiWu();
-
-	
-
 }
 
 //豌豆子弹与僵尸的碰撞检测实现
@@ -1081,7 +1116,7 @@ void checkZm2ZhiWu() {
 		if (zms[i].dead)continue;
 		int row = zms[i].row;
 		for (int k = 0; k < 9; k++) {
-			if (map[row][k].type == 0)continue;
+			if (plant_map[row][k].type == 0)continue;
 			int zhiWuX = 256 - 112 + k * 81;	//定义僵尸开吃范围
 			int x1 = zhiWuX + 10;//x1,x2分别为植物的左右界
 			int x2 = zhiWuX + 60;
@@ -1089,26 +1124,26 @@ void checkZm2ZhiWu() {
 
 			if (x3 > x1 && x3 < x2) //进入了僵尸与植物互吃的范围
 			{
-				if (map[row][k].type != SHI_REN_HUA + 1 && map[row][k].catched == true)
+				if (plant_map[row][k].type != SHI_REN_HUA + 1 && plant_map[row][k].catched == true)
 				{	//僵尸吃的过程中的一些配置
-					map[row][k].deadTimer++;
-					if (map[row][k].deadTimer > 100)
+					plant_map[row][k].deadTimer++;
+					if (plant_map[row][k].deadTimer > 100)
 					{	//僵尸吃完了-重置参数
-						map[row][k].deadTimer = 0;
-						map[row][k].type = 0;
+						plant_map[row][k].deadTimer = 0;
+						plant_map[row][k].type = 0;
 						zms[i].eating = false;
 						zms[i].frameIndex = 0;
-						zms[i].speed = 1;
+						zms[i].speed = zm_speed;
 					}
 				}
-				else if (map[row][k].type == SHI_REN_HUA + 1)
+				else if (plant_map[row][k].type == SHI_REN_HUA + 1)
 				{
-					if (map[row][k].eating == false)
+					if (plant_map[row][k].eating == false)
 					{
 						if (x3 <= x2)
 						{
-							map[row][k].catchzm = i;//记录每个食人花要吃的僵尸的索引
-							map[row][k].eating = true;
+							plant_map[row][k].catchzm = i;//记录每个食人花要吃的僵尸的索引
+							plant_map[row][k].eating = true;
 
 							/*zms[i].dead = true;
 							zms[i].used = false;*/
@@ -1116,26 +1151,26 @@ void checkZm2ZhiWu() {
 						}
 					}
 				}
-				else if (map[row][k].type == WALL_NUT + 1)
+				else if (plant_map[row][k].type == WALL_NUT + 1)
 				{
-					map[row][k].catched = true;
+					plant_map[row][k].catched = true;
 					zms[i].eating = true;
 					zms[i].speed = 0;
 					zms[i].frameIndex = 0;
-					map[row][k].deadTimer++;
-					if (map[row][k].deadTimer > 30000)
+					plant_map[row][k].deadTimer++;
+					if (plant_map[row][k].deadTimer > 30000)
 					{	//僵尸吃完了-重置参数
 						
 						zms[i].eating = false;
 						zms[i].frameIndex = 0;
-						zms[i].speed = 1;
-						map[row][k].deadTimer = 0;
-						map[row][k].type = 0;
+						zms[i].speed = zm_speed;
+						plant_map[row][k].deadTimer = 0;
+						plant_map[row][k].type = 0;
 					}
 				}
 				else {	//僵尸开吃-配置参数
-					map[row][k].catched = true;
-					map[row][k].deadTimer = 0;
+					plant_map[row][k].catched = true;
+					plant_map[row][k].deadTimer = 0;
 					zms[i].eating = true;
 					zms[i].speed = 0;
 					zms[i].frameIndex = 0;
@@ -1166,7 +1201,9 @@ void updatecar()
 	{
 		if (cars[i].move == true)
 		{
-			cars[i].x += 20;
+			cars[i].x += 10;
+			/*将每次增加的x值设定得过大时，车子在移动的时候可能会漏过部分僵尸
+			但设定的过小时又会影响观感，设定时应综合考虑俩方面*/
 		}
 		if (cars[i].x > WIN_WIDTH)
 		{
@@ -1183,7 +1220,7 @@ void checkcarzm()
 		int carsX = cars[i].x + 70;//60+70=130
 		for (int j = 0; j < ZM_MAX; j++)
 		{
-			if (zms[j].used && zms[j].dead == false && zms[j].row == i)
+			if (zms[j].used && zms[j].dead == false && zms[j].row == i&&cars[i].x <= WIN_WIDTH)
 			{
 				int zmX = zms[j].x + 80;//38+80=118
 				if (carsX > zmX && cars[i].used)
@@ -1197,8 +1234,12 @@ void checkcarzm()
 					}
 					else //小推车在运动后再碰到僵尸
 					{
-						killZmCount++;
-						cout << "杀掉的僵尸数：" << killZmCount << endl;
+						/*if (zms[i].dead == false)
+						{
+							killZmCount++;
+							cout << "杀掉的僵尸数：" << killZmCount << endl;
+						}	*/			
+						//将dead设为true后于updatezm()函数中即有增加计数的步骤，这里就没有必要了
 						zms[j].dead = true;
 						zms[j].speed = 0;
 						zms[j].frameIndex = 0;
@@ -1266,15 +1307,15 @@ void useshovel(ExMessage* msg)
 				for (int j = 0; j < 8; j++)
 				{
 					//180,230为植物地图左上角
-					//map[row][col].x = 256 - 112 + col * 81;	//植物坐标
-					//map[row][col].y = 179 + row * 102 + 14;
-					int plant_x1 = map[i][j].x;
-					int plant_x2 = map[i][j].x + 81;
-					int plant_y1 = map[i][j].y;
-					int plant_y2 = map[i][j].y + 102;
+					//plant_map[row][col].x = 256 - 112 + col * 81;	//植物坐标
+					//plant_map[row][col].y = 179 + row * 102 + 14;
+					int plant_x1 = plant_map[i][j].x;
+					int plant_x2 = plant_map[i][j].x + 81;
+					int plant_y1 = plant_map[i][j].y;
+					int plant_y2 = plant_map[i][j].y + 102;
 					if (msg->x > plant_x1&&msg->x<plant_x2&&msg->y>plant_y1&&msg->y < plant_y2&&msg->message == WM_LBUTTONDOWN)
 					{
-						map[i][j].type = 0;
+						plant_map[i][j].type = 0;
 						shovel_front.used = false;
 					}
 				}
@@ -1355,12 +1396,12 @@ void game_save()
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			outfile << map[i][j].catched << " " << map[i][j].deadTimer << " "
-				<< map[i][j].frameIndex << " " << map[i][j].shootTimer << " "
-				<< map[i][j].timer << " " << map[i][j].type << " "
-				<< map[i][j].x << " " << map[i][j].y << " "
-				<< map[i][j].eating << " " << map[i][j].digest << " "
-				<< map[i][j].digest_timer << " " << map[i][j].catchzm;
+			outfile << plant_map[i][j].catched << " " << plant_map[i][j].deadTimer << " "
+				<< plant_map[i][j].frameIndex << " " << plant_map[i][j].shootTimer << " "
+				<< plant_map[i][j].timer << " " << plant_map[i][j].type << " "
+				<< plant_map[i][j].x << " " << plant_map[i][j].y << " "
+				<< plant_map[i][j].eating << " " << plant_map[i][j].digest << " "
+				<< plant_map[i][j].digest_timer << " " << plant_map[i][j].catchzm;
 			outfile << endl;
 		}
 	}
@@ -1428,12 +1469,12 @@ void read_archive()
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			infile >> map[i][j].catched >> map[i][j].deadTimer
-				>> map[i][j].frameIndex >> map[i][j].shootTimer
-				>> map[i][j].timer >> map[i][j].type
-				>> map[i][j].x >> map[i][j].y
-				>> map[i][j].eating >> map[i][j].digest
-				>> map[i][j].digest_timer >> map[i][j].catchzm;
+			infile >> plant_map[i][j].catched >> plant_map[i][j].deadTimer
+				>> plant_map[i][j].frameIndex >> plant_map[i][j].shootTimer
+				>> plant_map[i][j].timer >> plant_map[i][j].type
+				>> plant_map[i][j].x >> plant_map[i][j].y
+				>> plant_map[i][j].eating >> plant_map[i][j].digest
+				>> plant_map[i][j].digest_timer >> plant_map[i][j].catchzm;
 		}
 	}
 
@@ -1591,7 +1632,7 @@ void read_regame()
 	killZmCount = gameStatus = 0;
 
 	memset(balls, 0, sizeof(balls));
-	memset(map, 0, sizeof(map));
+	memset(plant_map, 0, sizeof(plant_map));
 	memset(zms, 0, sizeof(zms));
 	//memset(cars, 0, sizeof(cars));
 	creatcar();
@@ -1644,15 +1685,15 @@ void chomper_eating(int x, int y)//此时x,y，即为食人花在植物地图上的位置
 	//	}
 	//}
 	Sleep(1);
-	map[x][y].frameIndex++;
-	int	zhiWuType = map[x][y].type - 1;
-	int	index = map[x][y].frameIndex;
+	plant_map[x][y].frameIndex++;
+	int	zhiWuType = plant_map[x][y].type - 1;
+	int	index = plant_map[x][y].frameIndex;
 	if (imgZhiWu[zhiWuType][index] == NULL) {
-		map[x][y].frameIndex = 0;
-		map[x][y].eating = false;
-		map[x][y].digest = true;
-		zms[map[x][y].catchzm].dead = true;
-		zms[map[x][y].catchzm].used = false;
+		plant_map[x][y].frameIndex = 0;
+		plant_map[x][y].eating = false;
+		plant_map[x][y].digest = true;
+		zms[plant_map[x][y].catchzm].dead = true;
+		zms[plant_map[x][y].catchzm].used = false;
 		killZmCount++;
 		cout << "杀掉的僵尸数为" << killZmCount << endl;
 		//z = 0;
@@ -1662,19 +1703,19 @@ void chomper_eating(int x, int y)//此时x,y，即为食人花在植物地图上的位置
 void chomper_digest(int x, int y)//此时x,y，即为食人花在植物地图上的位置
 {
 	Sleep(1);
-	map[x][y].frameIndex++;
-	int	zhiWuType = map[x][y].type - 1;
-	int	index = map[x][y].frameIndex;
+	plant_map[x][y].frameIndex++;
+	int	zhiWuType = plant_map[x][y].type - 1;
+	int	index = plant_map[x][y].frameIndex;
 	if (imgZhiWu[zhiWuType][index] == NULL) {
-		map[x][y].frameIndex = 0;
-		//map[x][y].eating = false; 
-		//map[x][y].digest = false;
-		map[x][y].digest_timer++;
+		plant_map[x][y].frameIndex = 0;
+		//plant_map[x][y].eating = false; 
+		//plant_map[x][y].digest = false;
+		plant_map[x][y].digest_timer++;
 	}
-	if (map[x][y].digest_timer > 5)
+	if (plant_map[x][y].digest_timer > 5)
 	{
-		map[x][y].digest_timer = 0;
-		map[x][y].digest = false;
+		plant_map[x][y].digest_timer = 0;
+		plant_map[x][y].digest = false;
 	}
 }
 
@@ -1686,9 +1727,9 @@ void cherry_boom(int x,int y)
 	if (count > 1)
 	{
 		count = 0;
-		map[x][y].frameIndex++;
-		int	zhiWuType = map[x][y].type - 1;
-		int	index = map[x][y].frameIndex;
+		plant_map[x][y].frameIndex++;
+		int	zhiWuType = plant_map[x][y].type - 1;
+		int	index = plant_map[x][y].frameIndex;
 
 
 		if (imgZhiWu[zhiWuType][index] == NULL) {
@@ -1708,7 +1749,7 @@ void cherry_boom(int x,int y)
 			//			zms[i].speed = 0;
 			//			zms[i].frameIndex = 0;
 			//			//longjmp(jmpbuffer_three, 1);
-			//			map[x][y].type = 0;
+			//			plant_map[x][y].type = 0;
 			//			/*killZmCount++;
 			//			cout << "杀掉的僵尸数为：" << killZmCount << endl;*/
 			//		}
@@ -1749,13 +1790,58 @@ void cherry_boom(int x,int y)
 						cout << "杀掉的僵尸数为:" << killZmCount << endl;
 					}
 				}
-
 			}
-
-			map[x][y].type = 0;
+			plant_map[x][y].type = 0;
 		}
 	}
-	
-	
 }
 
+void init_loadimage()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		imgloadacount[i] = new IMAGE;
+	}
+	//imgloadacount[0]为账号列表，1为当前账号，2.3为账号创建等
+	//IMAGE *imgloadacount[4];//系统的登录(没时间写了，套个皮)
+	loadimage(imgloadacount[0], "res/account/selectID.png");
+	loadimage(imgloadacount[1], "res/account/SelectorScreen_WoodSign1.png");
+	loadimage(imgloadacount[2], "res/account/SelectorScreen_WoodSign2.png");
+	loadimage(imgloadacount[3], "res/account/SelectorScreen_WoodSign2_press.png");
+}
+
+//账户的管理
+void account_manage(int &flag2)
+{
+	ExMessage	msg;
+	bool running = true;
+
+	while(running)
+	{
+			
+		BeginBatchDraw();//循环内渲染图片需要刷新缓冲区，故此处需要使用该函数
+		//putimagePNG(60, 70, imgloadacount[0]);
+		//渲染有问题，存在黑边
+		if (flag2 == 1)
+			putimagePNG(60, 70, imgloadacount[0]);
+		
+		if (peekmessage(&msg))
+		{
+			if (msg.x > 367-80 && msg.x < 560-100 && msg.y>490-20 && msg.y < 535-20 && msg.message == WM_LBUTTONDOWN)
+			{
+				flag2 = 0;
+				running = false;
+			} 				
+		}
+		EndBatchDraw();
+	}
+	
+
+	////加载(渲染)阳光值
+	//char accounnt[100];
+	//sprintf_s(accounnt, sizeof(accounnt), "%d", sunShine);	//把阳光值转换成字符类型
+	//outtextxy(110, 60, accounnt);			//渲染输出	位置可调整成居中,而不使用固定值y	255-283 80-108
+
+
+
+}

@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 using namespace std;
 #include<graphics.h>
@@ -12,6 +13,18 @@ using namespace std;
 #include <setjmp.h>//ÓÃÓÚº¯Êı¼äÌø×ª¹¦ÄÜµÄÊµÏÖ ÓÃÓÚÒ»¾ÖÓÎÏ·ÍË³öÌø×ªµ½Ö÷²Ëµ¥
 #include <Windows.h>
 #include<vector>
+//#include<opencv2/imgproc/types_c.h>//opencv£¬Æô¶¯(Æô¶¯²»ÁËÒ»µã£¬ÏÂ´ÎÖØÍ·×öÊ±ÔÙÓÃ)
+//#include<opencv2/opencv.hpp>
+
+//¶¨ÒåÈ«¾Ö³£Á¿À´Ìæ»»²¿·ÖÊı¾İ£¬±ÈÈç½©Ê¬ËÙ¶È£¬Ñô¹âÉú²úËÙÂÊ£¬Ö²ÎïÑªÁ¿µÈ
+//const int zm_speed = 3;//½©Ê¬ĞĞ×ßËÙ¶È
+//const int sunshine_product_speed = 150;//ÏòÈÕ¿ûÉú²úÑô¹âµÄËÙÂÊ
+//const int sunshine_collect_speed = 0.15;//Ñô¹âÊÕ¼¯µÄËÙÂÊ£¬ÓÉÓÚÊÕ¼¯ÒÀÀµÓÚ±´Èû¶ûÇúÏßÊµÏÖ£¬¹Ê´Ë´¦µÄÈ¡Öµ·¶Î§Ó¦¸ÃÎª0~1£¬Ô½´óÊÕ¼¯Ô½¿ì
+//Ê¹ÓÃÈ«¾Ö³£Á¿»á³öÎÊÌâ£¬ÕâÀï¾ÍÖ±½ÓÊ¹ÓÃºê¶¨ÒåÀ´½øĞĞÌæ»»ÁË
+#define zm_speed 3	//½©Ê¬ĞĞ×ßËÙ¶È
+#define sunshine_product_speed 150//ÏòÈÕ¿ûÉú²úÑô¹âµÄËÙÂÊ
+#define sunshine_collect_speed 0.15//Ñô¹âÊÕ¼¯µÄËÙÂÊ£¬ÓÉÓÚÊÕ¼¯ÒÀÀµÓÚ±´Èû¶ûÇúÏßÊµÏÖ£¬¹Ê´Ë´¦µÄÈ¡Öµ·¶Î§Ó¦¸ÃÎª0~1£¬Ô½´óÊÕ¼¯Ô½¿ì
+#define wandou_bullet_product_speed 50//Íã¶¹×Óµ¯µÄÉú²úËÙÂÊ£¬Ô½´óÔ½Âı
 
 extern jmp_buf jmpbuffer;
 extern jmp_buf jmpbuffer_two;
@@ -32,6 +45,7 @@ extern IMAGE *imgpause[9];//×Ü¹²9ÕÅÍ¼Æ¬£¬Íµ¸öÀÁ£¬×¢ÒâÃ¿¸öÔªËØ¶ÔÓ¦ÄÄÕÅÍ¼Æ¬°É£¬Ê¹Ó
 extern IMAGE imgtombstone;
 extern IMAGE *imgChomperAttack[18];//Ê³ÈË»¨³Ô½©Ê¬18Ö¡Í¼Æ¬
 extern IMAGE *imgChomperDigest[18];//Ê³ÈË»¨³Ô½©Ê¬18Ö¡Í¼Æ¬
+extern IMAGE *imgloadacount[4];//ÏµÍ³µÄµÇÂ¼(Ã»Ê±¼äĞ´ÁË£¬Ì×¸öÆ¤)
 
 
 extern int curX, curY;	//µ±Ç°Ñ¡ÖĞÖ²ÎïÔÚÒÆ¶¯ÖĞµÄ×ø±ê
@@ -141,7 +155,7 @@ extern int bulletMax ;	//Íã¶¹×Óµ¯³ØµÄ×ÜÊı
 
 extern int carmax ;//Ğ¡ÍÆ³µ×ÜÊı
 
-extern struct zhiWu map[3][9];	//µØÍ¼Êı×é£¬·½±ã´æ´¢Ö²Îï
+extern struct zhiWu plant_map[3][9];	//µØÍ¼Êı×é£¬·½±ã´æ´¢Ö²Îï
 
 extern int sunShine;	//Ñô¹âÖµ
 
@@ -250,5 +264,11 @@ void chomper_eating(int x, int y);
 //Ê³ÈË»¨Ïû»¯½©Ê¬µÄÊµÏÖ
 void chomper_digest(int x, int y);
 
-//Ó£ÌÒ±¬Õ¨ ·Ï°¸
+//Ó£ÌÒ±¬Õ¨ 
 void cherry_boom(int x,int y);
+
+//µÇÂ¼¼òµ¥ÊµÏÖ£¨Ã»Ê±¼äĞ´¾ßÌå£¬Ì×¸öÆ¤£©
+void init_loadimage();
+
+//ÕË»§¹ÜÀí
+void account_manage(int &flag2);
