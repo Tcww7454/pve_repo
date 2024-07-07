@@ -194,7 +194,7 @@ void gameInit() {
 void startUI() {
 	IMAGE imgMenu, imgMenu1, imgMenu2, imgcontinue1, imgcontinue2,imgsmallgame1,imgsmallgame2,imgExit2,imgExit1;
 	int	flag1 = 0, flag2 = 0,flag3=0;//以为开始游戏的图标，2为继续上局游戏的图标
-	int flag4 = 0, flag5 = 0, flag6 = 0;
+	int flag4 = 0,  flag6 = 0;
 	loadimage(&imgMenu, "res/menu.png");	//加载开始背景图
 	loadimage(&imgMenu1, "res/menu1.png");
 	loadimage(&imgMenu2, "res/menu2.png");
@@ -251,9 +251,9 @@ void startUI() {
 				msg.x > 60 && msg.x < 60 + 290 && msg.y>140 && msg.y < 140 + 70) {
 				//putimagePNG(280, 150, imgloadacount[0]);
 				flag4 = 1;
-				flag5 = 1; 
+				//flag5 = 1; 
 				
-				account_manage(flag5);
+				//account_manage();
 			}
 		}
 		//WM_LBUTTONUP
@@ -730,21 +730,52 @@ bool checkOver() {
 
 	if (gameStatus == WIN) {
 		Sleep(100);
-		loadimage(0, "res/bg.jpg");
+		//loadimage(0, "res/bg.jpg");
 		loadimage(&imgEnd1, "res/check_over/win.png");
-		putimage(-112, 0, &imgBg);
-		putimagePNG(300, 130, &imgEnd1);
 		mciSendString("play res/win.mp3", 0, 0, 0);
+		while (1)
+		{
+			BeginBatchDraw();
+			ExMessage msg;
+			//putimage(-112, 0, &imgBg);
+			putimagePNG(300, 130, &imgEnd1);
+			if (peekmessage(&msg))
+			{
+				if (msg.x > 300+70 && msg.x < 300+270 && msg.y>130+195 && msg.y < 130+227&&msg.message==WM_LBUTTONDOWN)
+				{
+					longjmp(jmpbuffer, 1);
+					//exit(0);
+				}
+			}
+			EndBatchDraw();
+		}	
 		ret = true;
 	}
 	else if (gameStatus == FAIL) {
 		Sleep(100);
-		loadimage(0, "res/bg.jpg");
-		loadimage(0, "res/check_over/lose.png");
+		//loadimage(0, "res/bg.jpg");
+		//loadimage(0, "res/check_over/lose.png");
 		loadimage(&imgEnd2, "res/check_over/lose.png");
-		putimage(-112, 0, &imgBg);
-		putimagePNG(300,130, &imgEnd2);
 		mciSendString("play res/lose.mp3", 0, 0, 0);
+		while (1)
+		{
+			BeginBatchDraw();
+			ExMessage msg;
+			//putimage(-112, 0, &imgBg);
+			putimagePNG(300, 130, &imgEnd1);
+			if (peekmessage(&msg))
+			{
+				if (msg.x > 300 + 70 && msg.x < 300 + 270 && msg.y>130 + 195 && msg.y < 130 + 227 && msg.message == WM_LBUTTONDOWN)
+				{
+					longjmp(jmpbuffer, 1);
+					//exit(0);
+				}
+			}
+			EndBatchDraw();
+		}
+		/*putimage(-112, 0, &imgBg);
+		putimagePNG(300,130, &imgEnd2);*/
+		
 		ret = true;
 	}
 	EndBatchDraw();
@@ -982,6 +1013,7 @@ void createZm() {
 		zms[i].dead = false;
 		zms[i].eating = false;
 		//zms[i].boom = false;
+		zms[i].catched = -1;
 
 		zmCount++;
 	}
@@ -1025,11 +1057,19 @@ void updateZm() {
 					}
 				}
 				else if (zms[i].eating) {
+					if (plant_map[zms[i].row][zms[i].catched].type == 0)
+					{
+						zms[i].catched = -1;
+						zms[i].eating = false;
+						zms[i].speed = zm_speed;
+					}
 					zms[i].frameIndex = (zms[i].frameIndex + 1) % 20;
 				}
 				else
 				{
 					zms[i].frameIndex = (zms[i].frameIndex + 1) % 21;	//僵尸会闪现	-未解决(发现问题，求余大于10就会闪现，不会解决)
+					
+					
 					//cout << "i=" << i << zms[i].frameIndex << endl;	//已破案，加载僵尸图片时，数量加载错了
 				}
 			}
@@ -1143,6 +1183,7 @@ void checkZm2ZhiWu() {
 
 			if (x3 > x1 && x3 < x2) //进入了僵尸与植物互吃的范围
 			{
+				zms[i].catched = k;
 				if (plant_map[row][k].type != SHI_REN_HUA + 1 && plant_map[row][k].catched == true
 					&& plant_map[row][k].type != WALL_NUT + 1)
 				{	//僵尸吃的过程中的一些配置
@@ -1716,6 +1757,9 @@ void chomper_eating(int x, int y)//此时x,y，即为食人花在植物地图上的位置
 		zms[plant_map[x][y].catchzm].used = false;
 		killZmCount++;
 		cout << "杀掉的僵尸数为" << killZmCount << endl;
+		if (killZmCount >= ZM_MAX) {
+			gameStatus = WIN;
+		}
 		//z = 0;
 	}
 }
