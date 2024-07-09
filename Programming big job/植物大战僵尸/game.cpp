@@ -106,8 +106,6 @@ void gameInit() {
 	//初始化阳光值
 	sunShine = 50;
 
-
-
 	//加载阳光
 	for (int i = 0; i < 29; i++) {	//29是固定值，可以寻求更匹配的方式
 		sprintf_s(name, sizeof(name), "res/sunshine/%d.png", i + 1);
@@ -153,7 +151,7 @@ void gameInit() {
 	loadimage(&imgCAR, "res/Screen/car.png");
 
 	//创建游戏窗口
-	initgraph(WIN_WIDTH, WIN_HEIGHT, 1/*,1*/);	//参数1表示再开一个控制台窗口	
+	initgraph(WIN_WIDTH, WIN_HEIGHT, 1);	//参数1表示再开一个控制台窗口	
 
 	//设置字体
 	LOGFONT	f;
@@ -183,9 +181,6 @@ void gameInit() {
 
 	//封装一个只需要在游戏开始时创建的物品的函数，这里只有小推车与铲子的创建函数
 	creat_front();
-
-	
-
 	/*loadimage(&imgBulletBlast[i], "res/bullets/bullet_blast.png",
 		imgBulletBlast[3].getwidth() * k, imgBulletBlast[3].getheight() * k, true);*/
 }
@@ -262,6 +257,7 @@ void startUI() {
 			{
 				flag1 = 0;
 				EndBatchDraw();
+				read_regame();//开始新游戏
 				return;
 			}
 			else if (msg.x > 484 && msg.x < 484 + 286 && msg.y>300 && msg.y < 300 + 122 && flag2 == 1)
@@ -398,7 +394,6 @@ void barsDown()
 //把图片加载到窗口上(渲染)
 void updateWindow()
 {
-
 	BeginBatchDraw();
 
 	//putimage(-112, 0, &imgBg);	//加载(渲染)背景板

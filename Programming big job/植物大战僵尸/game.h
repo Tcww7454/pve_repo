@@ -77,8 +77,7 @@ struct zhiWu {	//植物结构体
 	bool eating;//植物吃僵尸
 	bool digest;//植物的消化状态
 	int digest_timer;//消化的计时器
-	int catchzm;//植物捕捉到的僵尸的索引 如果为了数据稳定不应该这么写的，外部修改就容易造成越界，野指针等，发生未定义行为
-	//vector<int>being_eaten;
+	int catchzm;//植物捕捉到的僵尸的索引 如果为了数据稳定不应该这么写的，外部修改就容易造成越界，野指针等，发生未定义行为;
 };
 
 
@@ -272,10 +271,10 @@ void chomper_eating(int x, int y);
 void chomper_digest(int x, int y);
 
 //樱桃爆炸 
-void cherry_boom(int x,int y);
+void cherry_boom(int x,int y);//有待解决的bug
 
 //登录简单实现（没时间写具体，套个皮）
-void init_loadimage();
+void init_loadimage();//无内容,待实现
 
 //账户管理
-void account_manage();
+void account_manage();//无内容,待实现
